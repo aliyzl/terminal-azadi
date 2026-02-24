@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"os"
 
 	"github.com/leejooy96/azad/internal/cli"
+	"github.com/leejooy96/azad/internal/lifecycle"
 
 	// Import xray-core to validate it compiles as a library dependency.
 	_ "github.com/xtls/xray-core/core"
@@ -16,8 +19,19 @@ import (
 var version = "dev"
 
 func main() {
+	// Set up signal-based context for graceful shutdown.
+	ctx, cancel := lifecycle.WithShutdown(context.Background())
+	defer cancel()
+
+	// On context cancellation (SIGINT/SIGTERM), log the shutdown.
+	go func() {
+		<-ctx.Done()
+		fmt.Fprintln(os.Stderr, "Shutting down gracefully...")
+	}()
+
 	cmd := cli.NewRootCmd(version)
-	if err := cmd.Execute(); err != nil {
+	cmd.SetContext(ctx)
+	if err := cmd.ExecuteContext(ctx); err != nil {
 		os.Exit(1)
 	}
 }

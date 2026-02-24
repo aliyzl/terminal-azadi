@@ -1,9 +1,10 @@
 package cli
 
 import (
-	"fmt"
 	"os"
 
+	"github.com/leejooy96/azad/internal/config"
+	"github.com/leejooy96/azad/internal/lifecycle"
 	"github.com/spf13/cobra"
 )
 
@@ -20,11 +21,19 @@ func NewRootCmd(version string) *cobra.Command {
 		Long:  "Azad — One command to connect to the fastest VPN server through a stunning terminal interface",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			if cleanup {
-				fmt.Println("cleanup: not yet implemented")
+				configDir, err := config.Dir()
+				if err != nil {
+					return err
+				}
+				if err := lifecycle.RunCleanup(configDir); err != nil {
+					return err
+				}
 				os.Exit(0)
 			}
 			if resetTerminal {
-				fmt.Println("reset-terminal: not yet implemented")
+				if err := lifecycle.RunResetTerminal(); err != nil {
+					return err
+				}
 				os.Exit(0)
 			}
 			return nil

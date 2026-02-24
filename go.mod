@@ -10,6 +10,7 @@ require (
 	github.com/knadh/koanf/v2 v2.3.2
 	github.com/spf13/cobra v1.9.1
 	github.com/xtls/xray-core v1.260206.0
+	golang.org/x/term v0.40.0
 )
 
 require (
