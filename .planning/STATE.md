@@ -5,33 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** One command to connect to the fastest VPN server through a stunning terminal interface
-**Current focus:** Phase 2: Protocol Parsing
+**Current focus:** Phase 3: Connection Engine
 
 ## Current Position
 
-Phase: 2 of 6 (Protocol Parsing)
-Plan: 1 of 2 in current phase
-Status: In Progress
-Last activity: 2026-02-25 -- Completed 02-01-PLAN.md
+Phase: 3 of 6 (Connection Engine)
+Plan: 0 of ? in current phase
+Status: Phase 2 Complete
+Last activity: 2026-02-25 -- Completed 02-02-PLAN.md
 
-Progress: [███░░░░░░░] 25%
+Progress: [████░░░░░░] 33%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 15min
-- Total execution time: 0.7 hours
+- Total plans completed: 4
+- Average duration: 13min
+- Total execution time: 0.8 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Foundation | 2 | 39min | 20min |
-| 2. Protocol Parsing | 1 | 5min | 5min |
+| 2. Protocol Parsing | 2 | 9min | 5min |
 
 **Recent Trend:**
-- Last 5 plans: 35min, 4min, 5min
+- Last 5 plans: 35min, 4min, 5min, 4min
 - Trend: Accelerating
 
 *Updated after each plan completion*
@@ -56,6 +56,10 @@ Recent decisions affecting current work:
 - decodeBase64 tries 4 encoding variants: StdEncoding, RawStdEncoding, URLEncoding, RawURLEncoding (02-01)
 - Trojan defaults port 443 and TLS "tls"; VLESS defaults TLS "none" (02-01)
 - SS userinfo colon detection for base64 vs plaintext format (02-01)
+- Local decodeBase64 in subscription package to avoid coupling to protocol internals (02-02)
+- Atomic write uses CreateTemp then Rename for crash-safe persistence (02-02)
+- Load from non-existent file returns empty store (not error) for first-run (02-02)
+- ReplaceBySource for subscription refresh: filter by SubscriptionSource, preserve manual servers (02-02)
 
 ### Pending Todos
 
@@ -70,5 +74,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 02-01-PLAN.md (Protocol URI parsers with TDD). Phase 2 plan 1 of 2 complete.
-Resume file: .planning/phases/02-protocol-parsing/02-01-SUMMARY.md
+Stopped at: Completed 02-02-PLAN.md (Server store & subscription fetcher). Phase 2 complete (2/2 plans).
+Resume file: .planning/phases/02-protocol-parsing/02-02-SUMMARY.md

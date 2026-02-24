@@ -20,8 +20,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **PROT-02**: App parses vmess:// URIs (base64-encoded JSON) into server configurations
 - [x] **PROT-03**: App parses trojan:// URIs into server configurations
 - [x] **PROT-04**: App parses ss:// (Shadowsocks) URIs into server configurations
-- [ ] **PROT-05**: App fetches subscription URLs, decodes base64/base64url content, and extracts all protocol URIs
-- [ ] **PROT-06**: App stores servers in JSON format with rich metadata (name, protocol, latency, last connected, subscription source)
+- [x] **PROT-05**: App fetches subscription URLs, decodes base64/base64url content, and extracts all protocol URIs
+- [x] **PROT-06**: App stores servers in JSON format with rich metadata (name, protocol, latency, last connected, subscription source)
 
 ### Connection
 
@@ -106,8 +106,8 @@ Deferred to future release. Tracked but not in current roadmap.
 | PROT-02 | Phase 2 | Complete |
 | PROT-03 | Phase 2 | Complete |
 | PROT-04 | Phase 2 | Complete |
-| PROT-05 | Phase 2 | Pending |
-| PROT-06 | Phase 2 | Pending |
+| PROT-05 | Phase 2 | Complete |
+| PROT-06 | Phase 2 | Complete |
 | CONN-01 | Phase 3 | Pending |
 | CONN-02 | Phase 3 | Pending |
 | CONN-03 | Phase 3 | Pending |
@@ -141,4 +141,4 @@ Deferred to future release. Tracked but not in current roadmap.
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-25 after 02-01 completion*
+*Last updated: 2026-02-25 after 02-02 completion*
