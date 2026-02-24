@@ -45,11 +45,11 @@ Plans:
   2. Fetching a subscription URL decodes the response and extracts all server URIs regardless of base64/base64url encoding variations
   3. Server entries persist in JSON format with rich metadata (name, protocol, latency, last connected, subscription source) and survive app restarts
   4. Malformed URIs produce clear error messages identifying what went wrong, rather than silent failures or panics
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md — Server struct, 4 protocol parsers (VLESS/VMess/Trojan/SS), ParseURI dispatcher with TDD
+- [ ] 02-02-PLAN.md — Server JSON store with atomic writes, subscription fetcher with base64 decoding
 
 ### Phase 3: Connection Engine
 **Goal**: The app can start and stop an Xray-core proxy, route traffic through it, and manage system proxy state safely
