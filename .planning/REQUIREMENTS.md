@@ -1,0 +1,144 @@
+# Requirements: Azad
+
+**Defined:** 2026-02-24
+**Core Value:** One command to connect to the fastest VPN server through a stunning terminal interface
+
+## v1 Requirements
+
+Requirements for initial release. Each maps to roadmap phases.
+
+### Foundation
+
+- [ ] **FNDN-01**: App initializes Go module with xray-core as library dependency (not external binary)
+- [ ] **FNDN-02**: App reads/writes YAML config from XDG-compliant path (~/.config/azad/config.yaml)
+- [ ] **FNDN-03**: App provides cobra CLI with subcommands (connect, servers, config, --cleanup, --reset-terminal)
+- [ ] **FNDN-04**: App handles SIGTERM/SIGINT gracefully, cleaning up proxy and terminal state
+
+### Protocol Support
+
+- [ ] **PROT-01**: App parses vless:// URIs into server configurations
+- [ ] **PROT-02**: App parses vmess:// URIs (base64-encoded JSON) into server configurations
+- [ ] **PROT-03**: App parses trojan:// URIs into server configurations
+- [ ] **PROT-04**: App parses ss:// (Shadowsocks) URIs into server configurations
+- [ ] **PROT-05**: App fetches subscription URLs, decodes base64/base64url content, and extracts all protocol URIs
+- [ ] **PROT-06**: App stores servers in JSON format with rich metadata (name, protocol, latency, last connected, subscription source)
+
+### Connection
+
+- [ ] **CONN-01**: App starts Xray-core proxy via Go library API (core.New/instance.Start) on configurable SOCKS5 and HTTP ports
+- [ ] **CONN-02**: App stops Xray-core proxy cleanly via instance.Close()
+- [ ] **CONN-03**: App displays connection status (disconnected/connecting/connected/error) with current server name
+- [ ] **CONN-04**: App verifies connection works by checking external IP through the proxy
+- [ ] **CONN-05**: App sets/unsets macOS system proxy (SOCKS + HTTP) via networksetup or sysproxy
+- [ ] **CONN-06**: App detects and cleans up dirty proxy state on startup (previous crash left system proxy set)
+
+### Server Management
+
+- [ ] **SRVR-01**: User can view server list with name, protocol, and latency
+- [ ] **SRVR-02**: User can add server by pasting a protocol URI
+- [ ] **SRVR-03**: User can add servers from subscription URL
+- [ ] **SRVR-04**: User can refresh subscription to get latest server list
+- [ ] **SRVR-05**: User can remove individual servers or clear all
+- [ ] **SRVR-06**: App pings all servers concurrently with visual progress and sorts by latency
+
+### TUI
+
+- [ ] **TUI-01**: App displays a split-pane layout: server list panel, detail panel, status bar
+- [ ] **TUI-02**: User navigates with vim-style keys (j/k up/down, Enter select, Esc back, q quit)
+- [ ] **TUI-03**: User can fuzzy-search/filter servers by name, country, or protocol
+- [ ] **TUI-04**: Status bar shows: connection state, current server, proxy port, uptime
+- [ ] **TUI-05**: App shows contextual help via ? key with all available keybindings
+- [ ] **TUI-06**: App adapts layout to terminal size and shows minimum-size message if too small
+- [ ] **TUI-07**: App uses consistent color palette via lipgloss with readable output in both dark and light terminals
+
+### Quick Connect
+
+- [ ] **QCON-01**: User can run `azad` with no arguments to launch TUI and connect to last-used or fastest server
+- [ ] **QCON-02**: User can run `azad connect` for headless quick-connect (no TUI, just connect and show status)
+- [ ] **QCON-03**: App remembers last-used server and user preferences between sessions
+
+### Distribution
+
+- [ ] **DIST-01**: App builds as single binary for macOS (amd64, arm64) and Linux (amd64, arm64)
+- [ ] **DIST-02**: App auto-downloads geoip.dat and geosite.dat on first run if not present
+- [ ] **DIST-03**: App provides --cleanup and --reset-terminal recovery commands
+
+## v2 Requirements
+
+Deferred to future release. Tracked but not in current roadmap.
+
+### Advanced Features
+
+- **ADV-01**: Live connection statistics (bandwidth, data transferred, latency graph)
+- **ADV-02**: Auto-reconnect on connection drop with server failover
+- **ADV-03**: Theme support (dark/light/custom color schemes)
+- **ADV-04**: Server grouping by country or subscription provider
+- **ADV-05**: Profile/config switching (Work, Travel, etc.)
+- **ADV-06**: Export server as URI or terminal QR code
+- **ADV-07**: Toast notifications and scrollable event log
+- **ADV-08**: Windows support (system proxy, distribution)
+- **ADV-09**: One-key quick slots (1-9 for pinned servers)
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| Routing rules editor | Expert-level Xray config; provide sane defaults + file override for power users |
+| DNS configuration UI | Expert-level; use sensible defaults, allow config file override |
+| TUN mode / transparent proxy | Requires root, years of platform-specific work; SOCKS5+HTTP covers 95% of use cases |
+| Custom protocol implementation | Xray-core handles all protocols; we are a config generator and lifecycle manager |
+| GUI / web interface | Terminal-first is the differentiator; building a GUI is a different product |
+| Mobile support | Terminal apps don't run on phones |
+| Multi-language / i18n | English-first; accept community translations later |
+| Proxy chaining | Niche use case; users can chain externally |
+| Ad blocking / content filtering | Scope creep; use alongside DNS-based blocker |
+| Self-update mechanism | Security concern; distribute via package managers |
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| FNDN-01 | Phase 1 | Pending |
+| FNDN-02 | Phase 1 | Pending |
+| FNDN-03 | Phase 1 | Pending |
+| FNDN-04 | Phase 1 | Pending |
+| PROT-01 | Phase 2 | Pending |
+| PROT-02 | Phase 2 | Pending |
+| PROT-03 | Phase 2 | Pending |
+| PROT-04 | Phase 2 | Pending |
+| PROT-05 | Phase 2 | Pending |
+| PROT-06 | Phase 2 | Pending |
+| CONN-01 | Phase 3 | Pending |
+| CONN-02 | Phase 3 | Pending |
+| CONN-03 | Phase 3 | Pending |
+| CONN-04 | Phase 3 | Pending |
+| CONN-05 | Phase 3 | Pending |
+| CONN-06 | Phase 3 | Pending |
+| SRVR-01 | Phase 4 | Pending |
+| SRVR-02 | Phase 4 | Pending |
+| SRVR-03 | Phase 4 | Pending |
+| SRVR-04 | Phase 4 | Pending |
+| SRVR-05 | Phase 4 | Pending |
+| SRVR-06 | Phase 4 | Pending |
+| TUI-01 | Phase 5 | Pending |
+| TUI-02 | Phase 5 | Pending |
+| TUI-03 | Phase 5 | Pending |
+| TUI-04 | Phase 5 | Pending |
+| TUI-05 | Phase 5 | Pending |
+| TUI-06 | Phase 5 | Pending |
+| TUI-07 | Phase 5 | Pending |
+| QCON-01 | Phase 6 | Pending |
+| QCON-02 | Phase 6 | Pending |
+| QCON-03 | Phase 6 | Pending |
+| DIST-01 | Phase 6 | Pending |
+| DIST-02 | Phase 6 | Pending |
+| DIST-03 | Phase 6 | Pending |
+
+**Coverage:**
+- v1 requirements: 33 total
+- Mapped to phases: 33
+- Unmapped: 0 ✓
+
+---
+*Requirements defined: 2026-02-24*
+*Last updated: 2026-02-24 after initial definition*
