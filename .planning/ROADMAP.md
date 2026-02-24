@@ -48,7 +48,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Server struct, 4 protocol parsers (VLESS/VMess/Trojan/SS), ParseURI dispatcher with TDD
+- [x] 02-01-PLAN.md — Server struct, 4 protocol parsers (VLESS/VMess/Trojan/SS), ParseURI dispatcher with TDD
 - [ ] 02-02-PLAN.md — Server JSON store with atomic writes, subscription fetcher with base64 decoding
 
 ### Phase 3: Connection Engine
@@ -119,7 +119,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete    | 2026-02-24 |
-| 2. Protocol Parsing | 0/? | Not started | - |
+| 2. Protocol Parsing | 1/2 | In Progress | - |
 | 3. Connection Engine | 0/? | Not started | - |
 | 4. TUI and Server Interaction | 0/? | Not started | - |
 | 5. Quick Connect | 0/? | Not started | - |

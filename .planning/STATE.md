@@ -5,22 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** One command to connect to the fastest VPN server through a stunning terminal interface
-**Current focus:** Phase 1: Foundation
+**Current focus:** Phase 2: Protocol Parsing
 
 ## Current Position
 
-Phase: 1 of 6 (Foundation) -- COMPLETE
-Plan: 2 of 2 in current phase
-Status: Phase Complete
-Last activity: 2026-02-25 -- Completed 01-02-PLAN.md
+Phase: 2 of 6 (Protocol Parsing)
+Plan: 1 of 2 in current phase
+Status: In Progress
+Last activity: 2026-02-25 -- Completed 02-01-PLAN.md
 
-Progress: [██░░░░░░░░] 17%
+Progress: [███░░░░░░░] 25%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 20min
+- Total plans completed: 3
+- Average duration: 15min
 - Total execution time: 0.7 hours
 
 **By Phase:**
@@ -28,9 +28,10 @@ Progress: [██░░░░░░░░] 17%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Foundation | 2 | 39min | 20min |
+| 2. Protocol Parsing | 1 | 5min | 5min |
 
 **Recent Trend:**
-- Last 5 plans: 35min, 4min
+- Last 5 plans: 35min, 4min, 5min
 - Trend: Accelerating
 
 *Updated after each plan completion*
@@ -51,6 +52,10 @@ Recent decisions affecting current work:
 - Fresh koanf instance for Save() to avoid race conditions on shared state (01-02)
 - stty sane for crash-recovery terminal reset, bubbletea handles normal restore (01-02)
 - ProxyState JSON struct in .state.json for crash recovery (01-02)
+- Flat Server struct with omitempty JSON tags for optional fields (02-01)
+- decodeBase64 tries 4 encoding variants: StdEncoding, RawStdEncoding, URLEncoding, RawURLEncoding (02-01)
+- Trojan defaults port 443 and TLS "tls"; VLESS defaults TLS "none" (02-01)
+- SS userinfo colon detection for base64 vs plaintext format (02-01)
 
 ### Pending Todos
 
@@ -65,5 +70,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 01-02-PLAN.md (Config system + lifecycle management). Phase 1 Foundation complete.
-Resume file: .planning/phases/01-foundation/01-02-SUMMARY.md
+Stopped at: Completed 02-01-PLAN.md (Protocol URI parsers with TDD). Phase 2 plan 1 of 2 complete.
+Resume file: .planning/phases/02-protocol-parsing/02-01-SUMMARY.md

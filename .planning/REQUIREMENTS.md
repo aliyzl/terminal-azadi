@@ -16,10 +16,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Protocol Support
 
-- [ ] **PROT-01**: App parses vless:// URIs into server configurations
-- [ ] **PROT-02**: App parses vmess:// URIs (base64-encoded JSON) into server configurations
-- [ ] **PROT-03**: App parses trojan:// URIs into server configurations
-- [ ] **PROT-04**: App parses ss:// (Shadowsocks) URIs into server configurations
+- [x] **PROT-01**: App parses vless:// URIs into server configurations
+- [x] **PROT-02**: App parses vmess:// URIs (base64-encoded JSON) into server configurations
+- [x] **PROT-03**: App parses trojan:// URIs into server configurations
+- [x] **PROT-04**: App parses ss:// (Shadowsocks) URIs into server configurations
 - [ ] **PROT-05**: App fetches subscription URLs, decodes base64/base64url content, and extracts all protocol URIs
 - [ ] **PROT-06**: App stores servers in JSON format with rich metadata (name, protocol, latency, last connected, subscription source)
 
@@ -102,10 +102,10 @@ Deferred to future release. Tracked but not in current roadmap.
 | FNDN-02 | Phase 1 | Complete |
 | FNDN-03 | Phase 1 | Complete |
 | FNDN-04 | Phase 1 | Complete |
-| PROT-01 | Phase 2 | Pending |
-| PROT-02 | Phase 2 | Pending |
-| PROT-03 | Phase 2 | Pending |
-| PROT-04 | Phase 2 | Pending |
+| PROT-01 | Phase 2 | Complete |
+| PROT-02 | Phase 2 | Complete |
+| PROT-03 | Phase 2 | Complete |
+| PROT-04 | Phase 2 | Complete |
 | PROT-05 | Phase 2 | Pending |
 | PROT-06 | Phase 2 | Pending |
 | CONN-01 | Phase 3 | Pending |
@@ -141,4 +141,4 @@ Deferred to future release. Tracked but not in current roadmap.
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-24 after roadmap creation*
+*Last updated: 2026-02-25 after 02-01 completion*
