@@ -9,9 +9,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Foundation
 
-- [ ] **FNDN-01**: App initializes Go module with xray-core as library dependency (not external binary)
+- [x] **FNDN-01**: App initializes Go module with xray-core as library dependency (not external binary)
 - [ ] **FNDN-02**: App reads/writes YAML config from XDG-compliant path (~/.config/azad/config.yaml)
-- [ ] **FNDN-03**: App provides cobra CLI with subcommands (connect, servers, config, --cleanup, --reset-terminal)
+- [x] **FNDN-03**: App provides cobra CLI with subcommands (connect, servers, config, --cleanup, --reset-terminal)
 - [ ] **FNDN-04**: App handles SIGTERM/SIGINT gracefully, cleaning up proxy and terminal state
 
 ### Protocol Support
@@ -98,9 +98,9 @@ Deferred to future release. Tracked but not in current roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FNDN-01 | Phase 1 | Pending |
+| FNDN-01 | Phase 1 | Complete |
 | FNDN-02 | Phase 1 | Pending |
-| FNDN-03 | Phase 1 | Pending |
+| FNDN-03 | Phase 1 | Complete |
 | FNDN-04 | Phase 1 | Pending |
 | PROT-01 | Phase 2 | Pending |
 | PROT-02 | Phase 2 | Pending |
