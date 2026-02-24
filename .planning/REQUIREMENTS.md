@@ -120,25 +120,25 @@ Deferred to future release. Tracked but not in current roadmap.
 | SRVR-04 | Phase 4 | Pending |
 | SRVR-05 | Phase 4 | Pending |
 | SRVR-06 | Phase 4 | Pending |
-| TUI-01 | Phase 5 | Pending |
-| TUI-02 | Phase 5 | Pending |
-| TUI-03 | Phase 5 | Pending |
-| TUI-04 | Phase 5 | Pending |
-| TUI-05 | Phase 5 | Pending |
-| TUI-06 | Phase 5 | Pending |
-| TUI-07 | Phase 5 | Pending |
-| QCON-01 | Phase 6 | Pending |
-| QCON-02 | Phase 6 | Pending |
-| QCON-03 | Phase 6 | Pending |
+| TUI-01 | Phase 4 | Pending |
+| TUI-02 | Phase 4 | Pending |
+| TUI-03 | Phase 4 | Pending |
+| TUI-04 | Phase 4 | Pending |
+| TUI-05 | Phase 4 | Pending |
+| TUI-06 | Phase 4 | Pending |
+| TUI-07 | Phase 4 | Pending |
+| QCON-01 | Phase 5 | Pending |
+| QCON-02 | Phase 5 | Pending |
+| QCON-03 | Phase 5 | Pending |
 | DIST-01 | Phase 6 | Pending |
 | DIST-02 | Phase 6 | Pending |
 | DIST-03 | Phase 6 | Pending |
 
 **Coverage:**
-- v1 requirements: 33 total
-- Mapped to phases: 33
-- Unmapped: 0 ✓
+- v1 requirements: 35 total
+- Mapped to phases: 35
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-24 after initial definition*
+*Last updated: 2026-02-24 after roadmap creation*
