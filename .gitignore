@@ -1,0 +1,13 @@
+# Compiled binary
+/azad
+*.exe
+
+# OS artifacts
+.DS_Store
+
+# Data directory (geo files, runtime data)
+/data/
+*.dat
+
+# Logs
+*.log
