@@ -9,29 +9,29 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 
 ## Current Position
 
-Phase: 1 of 6 (Foundation)
-Plan: 1 of 2 in current phase
-Status: Executing
-Last activity: 2026-02-25 -- Completed 01-01-PLAN.md
+Phase: 1 of 6 (Foundation) -- COMPLETE
+Plan: 2 of 2 in current phase
+Status: Phase Complete
+Last activity: 2026-02-25 -- Completed 01-02-PLAN.md
 
-Progress: [█░░░░░░░░░] 8%
+Progress: [██░░░░░░░░] 17%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 35min
-- Total execution time: 0.6 hours
+- Total plans completed: 2
+- Average duration: 20min
+- Total execution time: 0.7 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1. Foundation | 1 | 35min | 35min |
+| 1. Foundation | 2 | 39min | 20min |
 
 **Recent Trend:**
-- Last 5 plans: 35min
-- Trend: Starting
+- Last 5 plans: 35min, 4min
+- Trend: Accelerating
 
 *Updated after each plan completion*
 
@@ -48,6 +48,9 @@ Recent decisions affecting current work:
 - cobra for CLI routing -- standard Go CLI framework
 - Root RunE returning Help() so standalone --cleanup/--reset-terminal work without subcommand
 - Explicit AddCommand() in builder function, no init() registration (01-01)
+- Fresh koanf instance for Save() to avoid race conditions on shared state (01-02)
+- stty sane for crash-recovery terminal reset, bubbletea handles normal restore (01-02)
+- ProxyState JSON struct in .state.json for crash recovery (01-02)
 
 ### Pending Todos
 
@@ -62,5 +65,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 01-01-PLAN.md (Go module + CLI skeleton)
-Resume file: .planning/phases/01-foundation/01-01-SUMMARY.md
+Stopped at: Completed 01-02-PLAN.md (Config system + lifecycle management). Phase 1 Foundation complete.
+Resume file: .planning/phases/01-foundation/01-02-SUMMARY.md

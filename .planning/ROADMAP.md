@@ -12,7 +12,7 @@ Azad is a full rewrite of a bash-based VLESS terminal tool into a professional G
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Go module, config system, CLI skeleton, signal handling, cleanup
+- [x] **Phase 1: Foundation** - Go module, config system, CLI skeleton, signal handling, cleanup
 - [ ] **Phase 2: Protocol Parsing** - Multi-protocol URI parsers, subscription fetcher, server data store
 - [ ] **Phase 3: Connection Engine** - Xray-core proxy lifecycle, system proxy, connection verification
 - [ ] **Phase 4: TUI and Server Interaction** - Full interactive terminal UI with server list, ping, navigation, and server management
@@ -34,7 +34,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01-PLAN.md — Go module init, xray-core dependency, project structure, cobra CLI skeleton with subcommands
-- [ ] 01-02-PLAN.md — koanf config system with XDG paths, signal handling, cleanup and reset-terminal commands
+- [x] 01-02-PLAN.md — koanf config system with XDG paths, signal handling, cleanup and reset-terminal commands
 
 ### Phase 2: Protocol Parsing
 **Goal**: All four protocol URIs parse correctly and subscriptions fetch into a persistent server store
@@ -118,7 +118,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 1/2 | In Progress | - |
+| 1. Foundation | 2/2 | Complete | 2026-02-25 |
 | 2. Protocol Parsing | 0/? | Not started | - |
 | 3. Connection Engine | 0/? | Not started | - |
 | 4. TUI and Server Interaction | 0/? | Not started | - |
