@@ -29,8 +29,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **CONN-02**: App stops Xray-core proxy cleanly via instance.Close()
 - [ ] **CONN-03**: App displays connection status (disconnected/connecting/connected/error) with current server name
 - [ ] **CONN-04**: App verifies connection works by checking external IP through the proxy
-- [ ] **CONN-05**: App sets/unsets macOS system proxy (SOCKS + HTTP) via networksetup or sysproxy
-- [ ] **CONN-06**: App detects and cleans up dirty proxy state on startup (previous crash left system proxy set)
+- [x] **CONN-05**: App sets/unsets macOS system proxy (SOCKS + HTTP) via networksetup or sysproxy
+- [x] **CONN-06**: App detects and cleans up dirty proxy state on startup (previous crash left system proxy set)
 
 ### Server Management
 
@@ -112,8 +112,8 @@ Deferred to future release. Tracked but not in current roadmap.
 | CONN-02 | Phase 3 | Pending |
 | CONN-03 | Phase 3 | Pending |
 | CONN-04 | Phase 3 | Pending |
-| CONN-05 | Phase 3 | Pending |
-| CONN-06 | Phase 3 | Pending |
+| CONN-05 | Phase 3 | Complete |
+| CONN-06 | Phase 3 | Complete |
 | SRVR-01 | Phase 4 | Pending |
 | SRVR-02 | Phase 4 | Pending |
 | SRVR-03 | Phase 4 | Pending |

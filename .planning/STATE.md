@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 3 of 6 (Connection Engine)
-Plan: 0 of ? in current phase
-Status: Phase 2 Complete
-Last activity: 2026-02-25 -- Completed 02-02-PLAN.md
+Plan: 2 of 3 in current phase
+Status: Executing Phase 3
+Last activity: 2026-02-25 -- Completed 03-02-PLAN.md
 
-Progress: [████░░░░░░] 33%
+Progress: [██████░░░░] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 13min
-- Total execution time: 0.8 hours
+- Total plans completed: 5
+- Average duration: 11min
+- Total execution time: 0.85 hours
 
 **By Phase:**
 
@@ -29,9 +29,10 @@ Progress: [████░░░░░░] 33%
 |-------|-------|-------|----------|
 | 1. Foundation | 2 | 39min | 20min |
 | 2. Protocol Parsing | 2 | 9min | 5min |
+| 3. Connection Engine | 1 | 3min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 35min, 4min, 5min, 4min
+- Last 5 plans: 4min, 5min, 4min, 3min
 - Trend: Accelerating
 
 *Updated after each plan completion*
@@ -60,6 +61,9 @@ Recent decisions affecting current work:
 - Atomic write uses CreateTemp then Rename for crash-safe persistence (02-02)
 - Load from non-existent file returns empty store (not error) for first-run (02-02)
 - ReplaceBySource for subscription refresh: filter by SubscriptionSource, preserve manual servers (02-02)
+- Direct networksetup calls via os/exec instead of getlantern/sysproxy library (03-02)
+- Package-level var runCommand for exec testability instead of interface/DI (03-02)
+- Cleanup warns but continues if UnsetSystemProxy fails -- state file removal is critical (03-02)
 
 ### Pending Todos
 
@@ -67,12 +71,12 @@ None yet.
 
 ### Blockers/Concerns
 
-- sysproxy library maintenance status unclear -- evaluate in Phase 3, fallback to platform commands
+- (RESOLVED) sysproxy library rejected -- using direct networksetup calls via os/exec (03-02)
 - Xray-core binary size confirmed at 44MB -- use -ldflags="-s -w" for distribution builds
 - lipgloss v2 technically beta -- pin version, monitor for breaking changes
 
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 02-02-PLAN.md (Server store & subscription fetcher). Phase 2 complete (2/2 plans).
-Resume file: .planning/phases/02-protocol-parsing/02-02-SUMMARY.md
+Stopped at: Completed 03-02-PLAN.md (System proxy management). Phase 3 in progress (2/3 plans).
+Resume file: .planning/phases/03-connection-engine/03-02-SUMMARY.md
