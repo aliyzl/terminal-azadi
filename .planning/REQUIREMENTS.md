@@ -34,7 +34,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Server Management
 
-- [ ] **SRVR-01**: User can view server list with name, protocol, and latency
+- [x] **SRVR-01**: User can view server list with name, protocol, and latency
 - [ ] **SRVR-02**: User can add server by pasting a protocol URI
 - [ ] **SRVR-03**: User can add servers from subscription URL
 - [ ] **SRVR-04**: User can refresh subscription to get latest server list
@@ -46,10 +46,10 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **TUI-01**: App displays a split-pane layout: server list panel, detail panel, status bar
 - [ ] **TUI-02**: User navigates with vim-style keys (j/k up/down, Enter select, Esc back, q quit)
 - [ ] **TUI-03**: User can fuzzy-search/filter servers by name, country, or protocol
-- [ ] **TUI-04**: Status bar shows: connection state, current server, proxy port, uptime
+- [x] **TUI-04**: Status bar shows: connection state, current server, proxy port, uptime
 - [ ] **TUI-05**: App shows contextual help via ? key with all available keybindings
 - [ ] **TUI-06**: App adapts layout to terminal size and shows minimum-size message if too small
-- [ ] **TUI-07**: App uses consistent color palette via lipgloss with readable output in both dark and light terminals
+- [x] **TUI-07**: App uses consistent color palette via lipgloss with readable output in both dark and light terminals
 
 ### Quick Connect
 
@@ -114,7 +114,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | CONN-04 | Phase 3 | Complete |
 | CONN-05 | Phase 3 | Complete |
 | CONN-06 | Phase 3 | Complete |
-| SRVR-01 | Phase 4 | Pending |
+| SRVR-01 | Phase 4 | Complete |
 | SRVR-02 | Phase 4 | Pending |
 | SRVR-03 | Phase 4 | Pending |
 | SRVR-04 | Phase 4 | Pending |
@@ -123,10 +123,10 @@ Deferred to future release. Tracked but not in current roadmap.
 | TUI-01 | Phase 4 | Pending |
 | TUI-02 | Phase 4 | Pending |
 | TUI-03 | Phase 4 | Pending |
-| TUI-04 | Phase 4 | Pending |
+| TUI-04 | Phase 4 | Complete |
 | TUI-05 | Phase 4 | Pending |
 | TUI-06 | Phase 4 | Pending |
-| TUI-07 | Phase 4 | Pending |
+| TUI-07 | Phase 4 | Complete |
 | QCON-01 | Phase 5 | Pending |
 | QCON-02 | Phase 5 | Pending |
 | QCON-03 | Phase 5 | Pending |

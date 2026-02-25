@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** One command to connect to the fastest VPN server through a stunning terminal interface
-**Current focus:** Phase 3: Connection Engine (COMPLETE)
+**Current focus:** Phase 4: TUI and Server Interaction
 
 ## Current Position
 
-Phase: 3 of 6 (Connection Engine) -- COMPLETE
-Plan: 3 of 3 in current phase (all complete)
-Status: Phase 3 Complete
-Last activity: 2026-02-25 -- Completed 03-03-PLAN.md
+Phase: 4 of 6 (TUI and Server Interaction)
+Plan: 1 of 3 in current phase
+Status: Executing Phase 4
+Last activity: 2026-02-25 -- Completed 04-01-PLAN.md
 
-Progress: [██████░░░░] 58%
+Progress: [██████░░░░] 62%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
-- Average duration: 9min
-- Total execution time: 0.97 hours
+- Total plans completed: 8
+- Average duration: 8min
+- Total execution time: 1.04 hours
 
 **By Phase:**
 
@@ -30,10 +30,11 @@ Progress: [██████░░░░] 58%
 | 1. Foundation | 2 | 39min | 20min |
 | 2. Protocol Parsing | 2 | 9min | 5min |
 | 3. Connection Engine | 3 | 10min | 3min |
+| 4. TUI & Server Interaction | 1 | 4min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 4min, 3min, 5min, 3min, 2min
-- Trend: Accelerating
+- Last 5 plans: 3min, 5min, 3min, 2min, 4min
+- Trend: Stable
 
 *Updated after each plan completion*
 
@@ -71,6 +72,9 @@ Recent decisions affecting current work:
 - Connection errors fatal, proxy/verify errors are warnings (continue with SOCKS5 proxy) (03-03)
 - ProxyState written BEFORE SetSystemProxy for crash safety (03-03)
 - VerifyIP uses Dial not DialContext -- proxy.Dialer interface constraint (03-03)
+- LightDark replaces AdaptiveColor in lipgloss v2 -- ColorPair struct with Resolve(isDark) method (04-01)
+- list.New in bubbles v2 takes 4 args (items, delegate, w, h) not just items (04-01)
+- Styles resolved at runtime via NewStyles(theme, isDark) from BackgroundColorMsg (04-01)
 
 ### Pending Todos
 
@@ -80,10 +84,10 @@ None yet.
 
 - (RESOLVED) sysproxy library rejected -- using direct networksetup calls via os/exec (03-02)
 - Xray-core binary size confirmed at 44MB -- use -ldflags="-s -w" for distribution builds
-- lipgloss v2 technically beta -- pin version, monitor for breaking changes
+- (RESOLVED) lipgloss v2 now stable v2.0.0 -- successfully integrated with LightDark pattern (04-01)
 
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 03-03-PLAN.md (Engine lifecycle + connect command). Phase 3 COMPLETE (3/3 plans).
-Resume file: .planning/phases/03-connection-engine/03-03-SUMMARY.md
+Stopped at: Completed 04-01-PLAN.md (TUI visual foundation). Phase 4 in progress (1/3 plans).
+Resume file: .planning/phases/04-tui-and-server-interaction/04-01-SUMMARY.md
