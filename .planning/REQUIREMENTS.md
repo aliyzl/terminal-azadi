@@ -26,9 +26,9 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Connection
 
 - [x] **CONN-01**: App starts Xray-core proxy via Go library API (core.New/instance.Start) on configurable SOCKS5 and HTTP ports
-- [ ] **CONN-02**: App stops Xray-core proxy cleanly via instance.Close()
-- [ ] **CONN-03**: App displays connection status (disconnected/connecting/connected/error) with current server name
-- [ ] **CONN-04**: App verifies connection works by checking external IP through the proxy
+- [x] **CONN-02**: App stops Xray-core proxy cleanly via instance.Close()
+- [x] **CONN-03**: App displays connection status (disconnected/connecting/connected/error) with current server name
+- [x] **CONN-04**: App verifies connection works by checking external IP through the proxy
 - [x] **CONN-05**: App sets/unsets macOS system proxy (SOCKS + HTTP) via networksetup or sysproxy
 - [x] **CONN-06**: App detects and cleans up dirty proxy state on startup (previous crash left system proxy set)
 
@@ -109,9 +109,9 @@ Deferred to future release. Tracked but not in current roadmap.
 | PROT-05 | Phase 2 | Complete |
 | PROT-06 | Phase 2 | Complete |
 | CONN-01 | Phase 3 | Complete |
-| CONN-02 | Phase 3 | Pending |
-| CONN-03 | Phase 3 | Pending |
-| CONN-04 | Phase 3 | Pending |
+| CONN-02 | Phase 3 | Complete |
+| CONN-03 | Phase 3 | Complete |
+| CONN-04 | Phase 3 | Complete |
 | CONN-05 | Phase 3 | Complete |
 | CONN-06 | Phase 3 | Complete |
 | SRVR-01 | Phase 4 | Pending |

@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** One command to connect to the fastest VPN server through a stunning terminal interface
-**Current focus:** Phase 3: Connection Engine
+**Current focus:** Phase 3: Connection Engine (COMPLETE)
 
 ## Current Position
 
-Phase: 3 of 6 (Connection Engine)
-Plan: 2 of 3 in current phase
-Status: Executing Phase 3
-Last activity: 2026-02-25 -- Completed 03-02-PLAN.md
+Phase: 3 of 6 (Connection Engine) -- COMPLETE
+Plan: 3 of 3 in current phase (all complete)
+Status: Phase 3 Complete
+Last activity: 2026-02-25 -- Completed 03-03-PLAN.md
 
-Progress: [██████░░░░] 50%
+Progress: [██████░░░░] 58%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 10min
-- Total execution time: 0.93 hours
+- Total plans completed: 7
+- Average duration: 9min
+- Total execution time: 0.97 hours
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [██████░░░░] 50%
 |-------|-------|-------|----------|
 | 1. Foundation | 2 | 39min | 20min |
 | 2. Protocol Parsing | 2 | 9min | 5min |
-| 3. Connection Engine | 2 | 8min | 4min |
+| 3. Connection Engine | 3 | 10min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 5min, 4min, 3min, 5min
+- Last 5 plans: 4min, 3min, 5min, 3min, 2min
 - Trend: Accelerating
 
 *Updated after each plan completion*
@@ -67,6 +67,10 @@ Recent decisions affecting current work:
 - Return both XrayConfig and *core.Config from BuildConfig for testability and inspection (03-01)
 - Local type definitions inside builder functions to avoid package-level type pollution (03-01)
 - REALITY fingerprint defaults to chrome; VMess security defaults to auto; VLESS encryption defaults to none (03-01)
+- Engine stores server copy (not pointer) to avoid external mutation of connected server (03-03)
+- Connection errors fatal, proxy/verify errors are warnings (continue with SOCKS5 proxy) (03-03)
+- ProxyState written BEFORE SetSystemProxy for crash safety (03-03)
+- VerifyIP uses Dial not DialContext -- proxy.Dialer interface constraint (03-03)
 
 ### Pending Todos
 
@@ -81,5 +85,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 03-01-PLAN.md (Xray JSON config builder). Phase 3 in progress (2/3 plans).
-Resume file: .planning/phases/03-connection-engine/03-01-SUMMARY.md
+Stopped at: Completed 03-03-PLAN.md (Engine lifecycle + connect command). Phase 3 COMPLETE (3/3 plans).
+Resume file: .planning/phases/03-connection-engine/03-03-SUMMARY.md
