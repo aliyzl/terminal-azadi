@@ -1,10 +1,16 @@
 package cli
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 
+	tea "charm.land/bubbletea/v2"
 	"github.com/leejooy96/azad/internal/config"
+	"github.com/leejooy96/azad/internal/engine"
 	"github.com/leejooy96/azad/internal/lifecycle"
+	"github.com/leejooy96/azad/internal/serverstore"
+	"github.com/leejooy96/azad/internal/tui"
 	"github.com/spf13/cobra"
 )
 
@@ -38,10 +44,38 @@ func NewRootCmd(version string) *cobra.Command {
 			}
 			return nil
 		},
-		// RunE is needed so the root command is runnable (not help-only).
-		// Without it, `azad --cleanup` would show help instead of running PersistentPreRunE.
+		// RunE launches the TUI when no subcommand is given.
+		// PersistentPreRunE intercepts --cleanup and --reset-terminal before this runs.
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return cmd.Help()
+			// Load config
+			configPath, err := config.FilePath()
+			if err != nil {
+				return fmt.Errorf("resolving config path: %w", err)
+			}
+			cfg, err := config.Load(configPath)
+			if err != nil {
+				return fmt.Errorf("loading config: %w", err)
+			}
+
+			// Load server store
+			dataDir, err := config.DataDir()
+			if err != nil {
+				return fmt.Errorf("resolving data dir: %w", err)
+			}
+			storePath := filepath.Join(dataDir, "servers.json")
+			store := serverstore.New(storePath)
+			if err := store.Load(); err != nil {
+				return fmt.Errorf("loading servers: %w", err)
+			}
+
+			// Create engine
+			eng := &engine.Engine{}
+
+			// Launch TUI
+			m := tui.New(store, eng, cfg)
+			p := tea.NewProgram(m)
+			_, err = p.Run()
+			return err
 		},
 	}
 
