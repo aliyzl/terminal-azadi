@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 4 of 6 (TUI and Server Interaction)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: Executing Phase 4
-Last activity: 2026-02-25 -- Completed 04-01-PLAN.md
+Last activity: 2026-02-25 -- Completed 04-02-PLAN.md
 
-Progress: [██████░░░░] 62%
+Progress: [███████░░░] 69%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
-- Average duration: 8min
-- Total execution time: 1.04 hours
+- Total plans completed: 9
+- Average duration: 7min
+- Total execution time: 1.09 hours
 
 **By Phase:**
 
@@ -30,10 +30,10 @@ Progress: [██████░░░░] 62%
 | 1. Foundation | 2 | 39min | 20min |
 | 2. Protocol Parsing | 2 | 9min | 5min |
 | 3. Connection Engine | 3 | 10min | 3min |
-| 4. TUI & Server Interaction | 1 | 4min | 4min |
+| 4. TUI & Server Interaction | 2 | 7min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 3min, 5min, 3min, 2min, 4min
+- Last 5 plans: 5min, 3min, 2min, 4min, 3min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -75,6 +75,10 @@ Recent decisions affecting current work:
 - LightDark replaces AdaptiveColor in lipgloss v2 -- ColorPair struct with Resolve(isDark) method (04-01)
 - list.New in bubbles v2 takes 4 args (items, delegate, w, h) not just items (04-01)
 - Styles resolved at runtime via NewStyles(theme, isDark) from BackgroundColorMsg (04-01)
+- KeyPressMsg.Keystroke() string matching for key routing -- more readable than Key struct inspection (04-02)
+- Help overlay replaces content via lipgloss.Place centering, not transparent overlay (04-02)
+- List filtering state gates key routing -- Filtering mode delegates all keys to list (04-02)
+- Root RunE loads config/store/engine inline and launches TUI via tea.NewProgram (04-02)
 
 ### Pending Todos
 
@@ -89,5 +93,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 04-01-PLAN.md (TUI visual foundation). Phase 4 in progress (1/3 plans).
-Resume file: .planning/phases/04-tui-and-server-interaction/04-01-SUMMARY.md
+Stopped at: Completed 04-02-PLAN.md (Root model and TUI launch). Phase 4 in progress (2/3 plans).
+Resume file: .planning/phases/04-tui-and-server-interaction/04-02-SUMMARY.md

@@ -43,12 +43,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### TUI
 
-- [ ] **TUI-01**: App displays a split-pane layout: server list panel, detail panel, status bar
-- [ ] **TUI-02**: User navigates with vim-style keys (j/k up/down, Enter select, Esc back, q quit)
-- [ ] **TUI-03**: User can fuzzy-search/filter servers by name, country, or protocol
+- [x] **TUI-01**: App displays a split-pane layout: server list panel, detail panel, status bar
+- [x] **TUI-02**: User navigates with vim-style keys (j/k up/down, Enter select, Esc back, q quit)
+- [x] **TUI-03**: User can fuzzy-search/filter servers by name, country, or protocol
 - [x] **TUI-04**: Status bar shows: connection state, current server, proxy port, uptime
-- [ ] **TUI-05**: App shows contextual help via ? key with all available keybindings
-- [ ] **TUI-06**: App adapts layout to terminal size and shows minimum-size message if too small
+- [x] **TUI-05**: App shows contextual help via ? key with all available keybindings
+- [x] **TUI-06**: App adapts layout to terminal size and shows minimum-size message if too small
 - [x] **TUI-07**: App uses consistent color palette via lipgloss with readable output in both dark and light terminals
 
 ### Quick Connect
@@ -120,12 +120,12 @@ Deferred to future release. Tracked but not in current roadmap.
 | SRVR-04 | Phase 4 | Pending |
 | SRVR-05 | Phase 4 | Pending |
 | SRVR-06 | Phase 4 | Pending |
-| TUI-01 | Phase 4 | Pending |
-| TUI-02 | Phase 4 | Pending |
-| TUI-03 | Phase 4 | Pending |
+| TUI-01 | Phase 4 | Complete |
+| TUI-02 | Phase 4 | Complete |
+| TUI-03 | Phase 4 | Complete |
 | TUI-04 | Phase 4 | Complete |
-| TUI-05 | Phase 4 | Pending |
-| TUI-06 | Phase 4 | Pending |
+| TUI-05 | Phase 4 | Complete |
+| TUI-06 | Phase 4 | Complete |
 | TUI-07 | Phase 4 | Complete |
 | QCON-01 | Phase 5 | Pending |
 | QCON-02 | Phase 5 | Pending |
