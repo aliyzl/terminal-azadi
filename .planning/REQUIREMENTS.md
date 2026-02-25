@@ -35,11 +35,11 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Server Management
 
 - [x] **SRVR-01**: User can view server list with name, protocol, and latency
-- [ ] **SRVR-02**: User can add server by pasting a protocol URI
-- [ ] **SRVR-03**: User can add servers from subscription URL
-- [ ] **SRVR-04**: User can refresh subscription to get latest server list
-- [ ] **SRVR-05**: User can remove individual servers or clear all
-- [ ] **SRVR-06**: App pings all servers concurrently with visual progress and sorts by latency
+- [x] **SRVR-02**: User can add server by pasting a protocol URI
+- [x] **SRVR-03**: User can add servers from subscription URL
+- [x] **SRVR-04**: User can refresh subscription to get latest server list
+- [x] **SRVR-05**: User can remove individual servers or clear all
+- [x] **SRVR-06**: App pings all servers concurrently with visual progress and sorts by latency
 
 ### TUI
 
@@ -115,11 +115,11 @@ Deferred to future release. Tracked but not in current roadmap.
 | CONN-05 | Phase 3 | Complete |
 | CONN-06 | Phase 3 | Complete |
 | SRVR-01 | Phase 4 | Complete |
-| SRVR-02 | Phase 4 | Pending |
-| SRVR-03 | Phase 4 | Pending |
-| SRVR-04 | Phase 4 | Pending |
-| SRVR-05 | Phase 4 | Pending |
-| SRVR-06 | Phase 4 | Pending |
+| SRVR-02 | Phase 4 | Complete |
+| SRVR-03 | Phase 4 | Complete |
+| SRVR-04 | Phase 4 | Complete |
+| SRVR-05 | Phase 4 | Complete |
+| SRVR-06 | Phase 4 | Complete |
 | TUI-01 | Phase 4 | Complete |
 | TUI-02 | Phase 4 | Complete |
 | TUI-03 | Phase 4 | Complete |

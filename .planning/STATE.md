@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 
 ## Current Position
 
-Phase: 4 of 6 (TUI and Server Interaction)
-Plan: 2 of 3 in current phase
-Status: Executing Phase 4
-Last activity: 2026-02-25 -- Completed 04-02-PLAN.md
+Phase: 4 of 6 (TUI and Server Interaction) -- COMPLETE
+Plan: 3 of 3 in current phase
+Status: Phase 4 Complete
+Last activity: 2026-02-25 -- Completed 04-03-PLAN.md
 
-Progress: [███████░░░] 69%
+Progress: [████████░░] 77%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
+- Total plans completed: 10
 - Average duration: 7min
-- Total execution time: 1.09 hours
+- Total execution time: 1.17 hours
 
 **By Phase:**
 
@@ -30,10 +30,10 @@ Progress: [███████░░░] 69%
 | 1. Foundation | 2 | 39min | 20min |
 | 2. Protocol Parsing | 2 | 9min | 5min |
 | 3. Connection Engine | 3 | 10min | 3min |
-| 4. TUI & Server Interaction | 2 | 7min | 4min |
+| 4. TUI & Server Interaction | 3 | 12min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 5min, 3min, 2min, 4min, 3min
+- Last 5 plans: 3min, 2min, 4min, 3min, 5min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -79,6 +79,9 @@ Recent decisions affecting current work:
 - Help overlay replaces content via lipgloss.Place centering, not transparent overlay (04-02)
 - List filtering state gates key routing -- Filtering mode delegates all keys to list (04-02)
 - Root RunE loads config/store/engine inline and launches TUI via tea.NewProgram (04-02)
+- Track ping latencies in model map rather than modifying serverstore -- avoids store API changes (04-03)
+- Input modal command functions take store as parameter (not closing over model state) for goroutine safety (04-03)
+- Overlay modals use lipgloss.Place centering over base content -- consistent with help overlay pattern (04-03)
 
 ### Pending Todos
 
@@ -93,5 +96,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 04-02-PLAN.md (Root model and TUI launch). Phase 4 in progress (2/3 plans).
-Resume file: .planning/phases/04-tui-and-server-interaction/04-02-SUMMARY.md
+Stopped at: Completed 04-03-PLAN.md (Server management actions). Phase 4 complete (3/3 plans).
+Resume file: .planning/phases/04-tui-and-server-interaction/04-03-SUMMARY.md
