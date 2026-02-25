@@ -1,11 +1,14 @@
 package engine
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/leejooy96/azad/internal/protocol"
 	"github.com/xtls/xray-core/core"
+	"github.com/xtls/xray-core/infra/conf/serial"
 )
 
 // XrayConfig represents the top-level Xray JSON configuration.
@@ -100,8 +103,314 @@ type RoutingRule struct {
 // It returns both the intermediate XrayConfig (for inspection/testing) and
 // the loaded core.Config ready for core.New().
 func BuildConfig(srv protocol.Server, socksPort, httpPort int) (*XrayConfig, *core.Config, error) {
-	_ = srv
-	_ = socksPort
-	_ = httpPort
-	return nil, nil, fmt.Errorf("not implemented")
+	// Build protocol-specific outbound.
+	outbound, err := buildOutbound(srv)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	cfg := &XrayConfig{
+		Log: LogConfig{LogLevel: "warning"},
+		Inbounds: []InboundConfig{
+			{
+				Tag:      "socks-in",
+				Listen:   "127.0.0.1",
+				Port:     socksPort,
+				Protocol: "socks",
+				Settings: json.RawMessage(`{"udp":true}`),
+			},
+			{
+				Tag:      "http-in",
+				Listen:   "127.0.0.1",
+				Port:     httpPort,
+				Protocol: "http",
+			},
+		},
+		Outbounds: []OutboundConfig{
+			outbound,
+			{Tag: "direct", Protocol: "freedom"},
+		},
+		Routing: RoutingConfig{
+			DomainStrategy: "IPIfNonMatch",
+			Rules: []RoutingRule{
+				{
+					Type:        "field",
+					OutboundTag: "direct",
+					IP:          []string{"geoip:private"},
+				},
+			},
+		},
+	}
+
+	// Marshal to JSON and load through Xray's config pipeline.
+	jsonBytes, err := json.Marshal(cfg)
+	if err != nil {
+		return nil, nil, fmt.Errorf("marshaling xray config: %w", err)
+	}
+
+	coreConfig, err := serial.LoadJSONConfig(bytes.NewReader(jsonBytes))
+	if err != nil {
+		return nil, nil, fmt.Errorf("loading xray config: %w", err)
+	}
+
+	return cfg, coreConfig, nil
+}
+
+// buildOutbound constructs the protocol-specific outbound config.
+func buildOutbound(srv protocol.Server) (OutboundConfig, error) {
+	var out OutboundConfig
+
+	switch srv.Protocol {
+	case protocol.ProtocolVLESS:
+		out = buildVLESSOutbound(srv)
+	case protocol.ProtocolVMess:
+		out = buildVMessOutbound(srv)
+	case protocol.ProtocolTrojan:
+		out = buildTrojanOutbound(srv)
+	case protocol.ProtocolShadowsocks:
+		out = buildShadowsocksOutbound(srv)
+	default:
+		return OutboundConfig{}, fmt.Errorf("unsupported protocol: %s", srv.Protocol)
+	}
+
+	return out, nil
+}
+
+// buildVLESSOutbound constructs a VLESS outbound.
+func buildVLESSOutbound(srv protocol.Server) OutboundConfig {
+	encryption := srv.Encryption
+	if encryption == "" {
+		encryption = "none"
+	}
+
+	type vlessUser struct {
+		ID         string `json:"id"`
+		Encryption string `json:"encryption"`
+		Flow       string `json:"flow,omitempty"`
+	}
+	type vnextEntry struct {
+		Address string      `json:"address"`
+		Port    int         `json:"port"`
+		Users   []vlessUser `json:"users"`
+	}
+	type vlessSettings struct {
+		Vnext []vnextEntry `json:"vnext"`
+	}
+
+	settings := vlessSettings{
+		Vnext: []vnextEntry{
+			{
+				Address: srv.Address,
+				Port:    srv.Port,
+				Users: []vlessUser{
+					{
+						ID:         srv.UUID,
+						Encryption: encryption,
+						Flow:       srv.Flow,
+					},
+				},
+			},
+		},
+	}
+
+	settingsJSON, _ := json.Marshal(settings)
+
+	out := OutboundConfig{
+		Tag:      "proxy",
+		Protocol: "vless",
+		Settings: settingsJSON,
+	}
+
+	out.StreamSettings = buildStreamSettings(srv)
+	return out
+}
+
+// buildVMessOutbound constructs a VMess outbound.
+func buildVMessOutbound(srv protocol.Server) OutboundConfig {
+	security := srv.Security
+	if security == "" {
+		security = "auto"
+	}
+
+	type vmessUser struct {
+		ID       string `json:"id"`
+		AlterID  int    `json:"alterId"`
+		Security string `json:"security"`
+	}
+	type vnextEntry struct {
+		Address string      `json:"address"`
+		Port    int         `json:"port"`
+		Users   []vmessUser `json:"users"`
+	}
+	type vmessSettings struct {
+		Vnext []vnextEntry `json:"vnext"`
+	}
+
+	settings := vmessSettings{
+		Vnext: []vnextEntry{
+			{
+				Address: srv.Address,
+				Port:    srv.Port,
+				Users: []vmessUser{
+					{
+						ID:       srv.UUID,
+						AlterID:  srv.AlterID,
+						Security: security,
+					},
+				},
+			},
+		},
+	}
+
+	settingsJSON, _ := json.Marshal(settings)
+
+	out := OutboundConfig{
+		Tag:      "proxy",
+		Protocol: "vmess",
+		Settings: settingsJSON,
+	}
+
+	out.StreamSettings = buildStreamSettings(srv)
+	return out
+}
+
+// buildTrojanOutbound constructs a Trojan outbound.
+func buildTrojanOutbound(srv protocol.Server) OutboundConfig {
+	type trojanServer struct {
+		Address  string `json:"address"`
+		Port     int    `json:"port"`
+		Password string `json:"password"`
+	}
+	type trojanSettings struct {
+		Servers []trojanServer `json:"servers"`
+	}
+
+	settings := trojanSettings{
+		Servers: []trojanServer{
+			{
+				Address:  srv.Address,
+				Port:     srv.Port,
+				Password: srv.Password,
+			},
+		},
+	}
+
+	settingsJSON, _ := json.Marshal(settings)
+
+	out := OutboundConfig{
+		Tag:      "proxy",
+		Protocol: "trojan",
+		Settings: settingsJSON,
+	}
+
+	out.StreamSettings = buildStreamSettings(srv)
+	return out
+}
+
+// buildShadowsocksOutbound constructs a Shadowsocks outbound.
+func buildShadowsocksOutbound(srv protocol.Server) OutboundConfig {
+	type ssServer struct {
+		Address  string `json:"address"`
+		Port     int    `json:"port"`
+		Method   string `json:"method"`
+		Password string `json:"password"`
+	}
+	type ssSettings struct {
+		Servers []ssServer `json:"servers"`
+	}
+
+	settings := ssSettings{
+		Servers: []ssServer{
+			{
+				Address:  srv.Address,
+				Port:     srv.Port,
+				Method:   srv.Method,
+				Password: srv.Password,
+			},
+		},
+	}
+
+	settingsJSON, _ := json.Marshal(settings)
+
+	out := OutboundConfig{
+		Tag:      "proxy",
+		Protocol: "shadowsocks",
+		Settings: settingsJSON,
+	}
+
+	// Shadowsocks with no network/TLS specified gets no stream settings.
+	if srv.Network != "" && srv.Network != "tcp" {
+		out.StreamSettings = buildStreamSettings(srv)
+	}
+
+	return out
+}
+
+// buildStreamSettings constructs transport and security settings.
+func buildStreamSettings(srv protocol.Server) *StreamSettings {
+	network := srv.Network
+	if network == "" {
+		network = "tcp"
+	}
+
+	security := srv.TLS
+	if security == "" {
+		security = "none"
+	}
+
+	ss := &StreamSettings{
+		Network:  network,
+		Security: security,
+	}
+
+	// Transport-specific settings.
+	switch network {
+	case "ws":
+		ws := &WsSettings{
+			Path: srv.Path,
+		}
+		if srv.Host != "" {
+			ws.Headers = map[string]string{"Host": srv.Host}
+		}
+		ss.WsSettings = ws
+	case "grpc":
+		ss.GrpcSettings = &GrpcSettings{
+			ServiceName: srv.ServiceName,
+		}
+	case "httpupgrade":
+		ss.HttpUpgradeSettings = &HttpUpgradeSettings{
+			Path: srv.Path,
+			Host: srv.Host,
+		}
+	}
+
+	// Security-specific settings.
+	switch security {
+	case "tls":
+		tls := &TLSSettings{
+			ServerName:  srv.SNI,
+			Fingerprint: srv.Fingerprint,
+		}
+		if srv.ALPN != "" {
+			tls.ALPN = strings.Split(srv.ALPN, ",")
+		}
+		if srv.AllowInsecure {
+			tls.AllowInsecure = true
+		}
+		ss.TLSSettings = tls
+	case "reality":
+		fingerprint := srv.Fingerprint
+		if fingerprint == "" {
+			fingerprint = "chrome"
+		}
+		ss.RealitySettings = &RealitySettings{
+			ServerName:  srv.SNI,
+			Fingerprint: fingerprint,
+			PublicKey:   srv.PublicKey,
+			ShortID:     srv.ShortID,
+			SpiderX:     srv.SpiderX,
+		}
+	}
+
+	return ss
 }

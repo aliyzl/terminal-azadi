@@ -2,6 +2,9 @@ package engine
 
 import (
 	"encoding/json"
+	"os"
+	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/leejooy96/azad/internal/protocol"
@@ -9,6 +12,17 @@ import (
 	// Register all xray-core protocol handlers and JSON config loader.
 	_ "github.com/xtls/xray-core/main/distro/all"
 )
+
+// TestMain sets XRAY_LOCATION_ASSET so routing rules can find geoip.dat/geosite.dat.
+func TestMain(m *testing.M) {
+	// Walk up from the test file to find the project root containing geoip.dat.
+	_, filename, _, _ := runtime.Caller(0)
+	projectRoot := filepath.Join(filepath.Dir(filename), "..", "..")
+	if abs, err := filepath.Abs(projectRoot); err == nil {
+		os.Setenv("XRAY_LOCATION_ASSET", abs)
+	}
+	os.Exit(m.Run())
+}
 
 // testCase defines a table-driven test for BuildConfig.
 type testCase struct {
@@ -36,7 +50,7 @@ func TestBuildConfig(t *testing.T) {
 				TLS:         "reality",
 				SNI:         "www.microsoft.com",
 				Fingerprint: "chrome",
-				PublicKey:   "test-public-key",
+				PublicKey:   "RKAyucyPBLpwLK2SiW5pvbHTPg6NWa1lOs08EZJuEGk",
 				ShortID:     "abcd1234",
 				SpiderX:    "/",
 			},
@@ -102,8 +116,8 @@ func TestBuildConfig(t *testing.T) {
 				if ss.RealitySettings.Fingerprint != "chrome" {
 					t.Errorf("fingerprint = %q, want chrome", ss.RealitySettings.Fingerprint)
 				}
-				if ss.RealitySettings.PublicKey != "test-public-key" {
-					t.Errorf("publicKey = %q, want test-public-key", ss.RealitySettings.PublicKey)
+				if ss.RealitySettings.PublicKey != "RKAyucyPBLpwLK2SiW5pvbHTPg6NWa1lOs08EZJuEGk" {
+					t.Errorf("publicKey = %q, want RKAyucyPBLpwLK2SiW5pvbHTPg6NWa1lOs08EZJuEGk", ss.RealitySettings.PublicKey)
 				}
 				if ss.RealitySettings.ShortID != "abcd1234" {
 					t.Errorf("shortId = %q, want abcd1234", ss.RealitySettings.ShortID)
@@ -632,8 +646,8 @@ func TestBuildConfigDefaults(t *testing.T) {
 		Network:   "tcp",
 		TLS:       "reality",
 		SNI:       "www.example.com",
-		PublicKey: "pk123",
-		ShortID:   "sid123",
+		PublicKey: "RKAyucyPBLpwLK2SiW5pvbHTPg6NWa1lOs08EZJuEGk",
+		ShortID:   "0a1b2c3d",
 	}
 	xrayCfg3, _, err := BuildConfig(srv3, 1080, 8080)
 	if err != nil {
