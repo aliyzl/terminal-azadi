@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
+	"github.com/leejooy96/azad/internal/sysproxy"
 	"golang.org/x/term"
 )
 
@@ -20,9 +21,8 @@ type ProxyState struct {
 	PID            int    `json:"pid"`
 }
 
-// RunCleanup checks for dirty proxy state from a previous crash and reports what
-// needs to be cleaned. In Phase 1 this is informational only -- actual networksetup
-// commands to reverse proxy settings come in Phase 3.
+// RunCleanup checks for dirty proxy state from a previous crash and reverses it.
+// It reads .state.json, calls networksetup to unset system proxy, then removes the state file.
 func RunCleanup(configDir string) error {
 	stateFile := filepath.Join(configDir, ".state.json")
 
@@ -47,7 +47,13 @@ func RunCleanup(configDir string) error {
 		fmt.Printf("  HTTP port:       %d\n", state.HTTPPort)
 		fmt.Printf("  PID:             %d\n", state.PID)
 		fmt.Println()
-		// Phase 3 will add actual networksetup commands here to unset proxy.
+
+		// Reverse the system proxy via networksetup
+		if err := sysproxy.UnsetSystemProxy(state.NetworkService); err != nil {
+			fmt.Printf("Warning: failed to unset system proxy: %v\n", err)
+		} else {
+			fmt.Printf("Reversed system proxy on: %s\n", state.NetworkService)
+		}
 		fmt.Println("Proxy state cleaned.")
 
 		if err := os.Remove(stateFile); err != nil {
