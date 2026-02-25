@@ -19,9 +19,9 @@ Progress: [██████░░░░] 50%
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: 11min
-- Total execution time: 0.85 hours
+- Total plans completed: 6
+- Average duration: 10min
+- Total execution time: 0.93 hours
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [██████░░░░] 50%
 |-------|-------|-------|----------|
 | 1. Foundation | 2 | 39min | 20min |
 | 2. Protocol Parsing | 2 | 9min | 5min |
-| 3. Connection Engine | 1 | 3min | 3min |
+| 3. Connection Engine | 2 | 8min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 4min, 5min, 4min, 3min
+- Last 5 plans: 5min, 4min, 3min, 5min
 - Trend: Accelerating
 
 *Updated after each plan completion*
@@ -64,6 +64,9 @@ Recent decisions affecting current work:
 - Direct networksetup calls via os/exec instead of getlantern/sysproxy library (03-02)
 - Package-level var runCommand for exec testability instead of interface/DI (03-02)
 - Cleanup warns but continues if UnsetSystemProxy fails -- state file removal is critical (03-02)
+- Return both XrayConfig and *core.Config from BuildConfig for testability and inspection (03-01)
+- Local type definitions inside builder functions to avoid package-level type pollution (03-01)
+- REALITY fingerprint defaults to chrome; VMess security defaults to auto; VLESS encryption defaults to none (03-01)
 
 ### Pending Todos
 
@@ -78,5 +81,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 03-02-PLAN.md (System proxy management). Phase 3 in progress (2/3 plans).
-Resume file: .planning/phases/03-connection-engine/03-02-SUMMARY.md
+Stopped at: Completed 03-01-PLAN.md (Xray JSON config builder). Phase 3 in progress (2/3 plans).
+Resume file: .planning/phases/03-connection-engine/03-01-SUMMARY.md

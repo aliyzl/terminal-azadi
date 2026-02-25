@@ -25,7 +25,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Connection
 
-- [ ] **CONN-01**: App starts Xray-core proxy via Go library API (core.New/instance.Start) on configurable SOCKS5 and HTTP ports
+- [x] **CONN-01**: App starts Xray-core proxy via Go library API (core.New/instance.Start) on configurable SOCKS5 and HTTP ports
 - [ ] **CONN-02**: App stops Xray-core proxy cleanly via instance.Close()
 - [ ] **CONN-03**: App displays connection status (disconnected/connecting/connected/error) with current server name
 - [ ] **CONN-04**: App verifies connection works by checking external IP through the proxy
@@ -108,7 +108,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | PROT-04 | Phase 2 | Complete |
 | PROT-05 | Phase 2 | Complete |
 | PROT-06 | Phase 2 | Complete |
-| CONN-01 | Phase 3 | Pending |
+| CONN-01 | Phase 3 | Complete |
 | CONN-02 | Phase 3 | Pending |
 | CONN-03 | Phase 3 | Pending |
 | CONN-04 | Phase 3 | Pending |
