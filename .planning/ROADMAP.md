@@ -61,11 +61,12 @@ Plans:
   3. Connection status transitions (disconnected -> connecting -> connected -> error) are tracked and observable through the CLI
   4. After connecting, app verifies the external IP through the proxy and confirms it differs from the direct IP
   5. On macOS, app sets system proxy on connect and unsets on disconnect, and detects/cleans dirty proxy state on startup
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
+- [ ] 03-01-PLAN.md — Xray JSON config builder (TDD): Server struct to Xray JSON for all 4 protocols
+- [ ] 03-02-PLAN.md — System proxy management: macOS networksetup detect/set/unset + cleanup upgrade
+- [ ] 03-03-PLAN.md — Engine lifecycle + IP verify + CLI connect: Start/Stop state machine, IP check, connect command wiring
 
 ### Phase 4: TUI and Server Interaction
 **Goal**: Users interact with a beautiful, keyboard-driven terminal interface to browse servers, ping them, manage subscriptions, and connect
