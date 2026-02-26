@@ -38,6 +38,14 @@ One command to connect to the fastest VPN server through a stunning terminal int
 - [ ] Auto-reconnect on connection drop
 - [ ] Smart server selection (remember last, auto-pick fastest)
 
+- [ ] Split tunneling with inclusive/exclusive modes (Windscribe-style)
+  - SPLT-01: Inclusive mode — only listed IPs/hostnames route through VPN, rest goes direct
+  - SPLT-02: Exclusive mode — all traffic through VPN except listed IPs/hostnames which go direct
+  - SPLT-03: Rule types — single IPs, CIDR ranges (e.g. 10.0.0.0/8), hostnames, wildcard domains (*.example.com)
+  - SPLT-04: TUI management — add/remove rules, switch modes, view active rules through the TUI
+  - SPLT-05: CLI management — `azad split-tunnel` subcommand for headless rule management
+  - SPLT-06: Kill switch coordination — split tunnel rules integrate cleanly with kill switch firewall rules
+
 ### Out of Scope
 
 - GUI/desktop application — terminal-first, always
