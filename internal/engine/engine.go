@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/leejooy96/azad/internal/config"
+	"github.com/leejooy96/azad/internal/geoasset"
 	"github.com/leejooy96/azad/internal/protocol"
 	"github.com/leejooy96/azad/internal/splittunnel"
 	"github.com/xtls/xray-core/core"
@@ -69,6 +70,12 @@ func (e *Engine) Start(ctx context.Context, srv protocol.Server, socksPort, http
 	dataDir, err := config.DataDir()
 	if err == nil {
 		os.Setenv("XRAY_LOCATION_ASSET", dataDir)
+	}
+
+	// Ensure geo assets (geoip.dat, geosite.dat) exist before Xray init.
+	// Xray panics if routing rules reference geoip:private with missing files.
+	if err := geoasset.EnsureAssets(dataDir); err != nil {
+		return fmt.Errorf("ensuring geo assets: %w", err)
 	}
 
 	// Extract split tunnel config if provided.

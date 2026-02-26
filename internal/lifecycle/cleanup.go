@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 
 	"github.com/leejooy96/azad/internal/killswitch"
 	"github.com/leejooy96/azad/internal/sysproxy"
@@ -54,23 +55,31 @@ func RunCleanup(configDir string) error {
 		fmt.Printf("  PID:             %d\n", state.PID)
 		fmt.Println()
 
-		// Reverse the system proxy via networksetup
-		if err := sysproxy.UnsetSystemProxy(state.NetworkService); err != nil {
-			fmt.Printf("Warning: failed to unset system proxy: %v\n", err)
-		} else {
-			fmt.Printf("Reversed system proxy on: %s\n", state.NetworkService)
+		// Reverse the system proxy (platform-gated).
+		if runtime.GOOS == "darwin" {
+			if err := sysproxy.UnsetSystemProxy(state.NetworkService); err != nil {
+				fmt.Printf("Warning: failed to unset system proxy: %v\n", err)
+			} else {
+				fmt.Printf("Reversed system proxy on: %s\n", state.NetworkService)
+			}
+		} else if runtime.GOOS == "linux" {
+			fmt.Println("Linux: proxy was application-level, no system proxy to clean up.")
 		}
 		fmt.Println("Proxy state cleaned.")
 	}
 
-	// Kill switch cleanup
+	// Kill switch cleanup (platform-gated).
 	if state.KillSwitchActive {
 		fmt.Println("Found active kill switch from previous session.")
-		if err := killswitch.Cleanup(); err != nil {
-			fmt.Printf("Warning: failed to flush kill switch rules: %v\n", err)
-			fmt.Printf("Manual recovery: sudo pfctl -a com.azad.killswitch -F all\n")
-		} else {
-			fmt.Println("Kill switch firewall rules removed.")
+		if runtime.GOOS == "darwin" {
+			if err := killswitch.Cleanup(); err != nil {
+				fmt.Printf("Warning: failed to flush kill switch rules: %v\n", err)
+				fmt.Printf("Manual recovery: sudo pfctl -a com.azad.killswitch -F all\n")
+			} else {
+				fmt.Println("Kill switch firewall rules removed.")
+			}
+		} else if runtime.GOOS == "linux" {
+			fmt.Println("Linux: kill switch cleanup not yet supported. Manual: sudo iptables -F azad")
 		}
 	}
 
