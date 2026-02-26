@@ -15,6 +15,7 @@ import (
 	"github.com/leejooy96/azad/internal/lifecycle"
 	"github.com/leejooy96/azad/internal/protocol"
 	"github.com/leejooy96/azad/internal/serverstore"
+	"github.com/leejooy96/azad/internal/splittunnel"
 	"github.com/leejooy96/azad/internal/sysproxy"
 	"github.com/spf13/cobra"
 )
@@ -63,15 +64,34 @@ func runConnect(cmd *cobra.Command, args []string) error {
 
 	fmt.Printf("Connecting to %s (%s:%d)...\n", server.Name, server.Address, server.Port)
 
+	// Build split tunnel runtime config from persisted config.
+	var splitCfg *splittunnel.Config
+	if cfg.SplitTunnel.Enabled && len(cfg.SplitTunnel.Rules) > 0 {
+		mode := splittunnel.ModeExclusive
+		if cfg.SplitTunnel.Mode == "inclusive" {
+			mode = splittunnel.ModeInclusive
+		}
+		var rules []splittunnel.Rule
+		for _, r := range cfg.SplitTunnel.Rules {
+			rules = append(rules, splittunnel.Rule{Value: r.Value, Type: splittunnel.RuleType(r.Type)})
+		}
+		splitCfg = &splittunnel.Config{Enabled: true, Mode: mode, Rules: rules}
+	}
+
 	// Start the proxy engine.
 	eng := &engine.Engine{}
 	ctx := cmd.Context()
-	if err := eng.Start(ctx, *server, cfg.Proxy.SOCKSPort, cfg.Proxy.HTTPPort); err != nil {
+	if err := eng.Start(ctx, *server, cfg.Proxy.SOCKSPort, cfg.Proxy.HTTPPort, splitCfg); err != nil {
 		return fmt.Errorf("starting proxy: %w", err)
 	}
 
 	fmt.Printf("Proxy started on SOCKS5://127.0.0.1:%d and HTTP://127.0.0.1:%d\n",
 		cfg.Proxy.SOCKSPort, cfg.Proxy.HTTPPort)
+
+	// Print split tunnel status.
+	if splitCfg != nil {
+		fmt.Printf("Split tunneling: %s mode with %d rules\n", splitCfg.Mode, len(splitCfg.Rules))
+	}
 
 	// Detect network service for system proxy.
 	svc, svcErr := sysproxy.DetectNetworkService()
@@ -81,6 +101,26 @@ func runConnect(cmd *cobra.Command, args []string) error {
 	if killSwitchFlag {
 		if ips, err := net.LookupHost(server.Address); err == nil && len(ips) > 0 {
 			resolvedIP = ips[0]
+		}
+	}
+
+	// Extract bypass IPs from split tunnel rules for kill switch pf coordination.
+	var bypassIPs []string
+	if splitCfg != nil && splitCfg.Mode == splittunnel.ModeExclusive {
+		for _, r := range splitCfg.Rules {
+			switch r.Type {
+			case splittunnel.RuleTypeIP, splittunnel.RuleTypeCIDR:
+				bypassIPs = append(bypassIPs, r.Value)
+			case splittunnel.RuleTypeDomain, splittunnel.RuleTypeWildcard:
+				// Resolve domain to IP for pf bypass (best-effort).
+				domain := r.Value
+				if r.Type == splittunnel.RuleTypeWildcard {
+					domain = strings.TrimPrefix(domain, "*.")
+				}
+				if ips, err := net.LookupHost(domain); err == nil {
+					bypassIPs = append(bypassIPs, ips...)
+				}
+			}
 		}
 	}
 
@@ -101,7 +141,7 @@ func runConnect(cmd *cobra.Command, args []string) error {
 
 	// Enable kill switch if requested.
 	if killSwitchFlag {
-		if err := killswitch.Enable(resolvedIP, server.Port); err != nil {
+		if err := killswitch.Enable(resolvedIP, server.Port, bypassIPs); err != nil {
 			fmt.Printf("Warning: could not enable kill switch: %v\n", err)
 		} else {
 			fmt.Println("Kill switch enabled -- all non-VPN traffic blocked.")

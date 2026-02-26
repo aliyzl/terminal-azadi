@@ -98,7 +98,7 @@ func NewRootCmd(version string) *cobra.Command {
 	rootCmd.PersistentFlags().BoolVar(&cleanup, "cleanup", false, "Remove dirty proxy state from a previous crash")
 	rootCmd.PersistentFlags().BoolVar(&resetTerminal, "reset-terminal", false, "Restore terminal to usable state")
 
-	rootCmd.AddCommand(newConnectCmd(), newServersCmd(), newConfigCmd())
+	rootCmd.AddCommand(newConnectCmd(), newServersCmd(), newConfigCmd(), newSplitTunnelCmd())
 
 	return rootCmd
 }
