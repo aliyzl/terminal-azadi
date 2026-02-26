@@ -10,16 +10,16 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 6 of 8 (Distribution)
-Plan: 0 of 4 in current phase
-Status: Not started
-Last activity: 2026-02-26 -- Updated Phase 6 scope (expanded: install script, Homebrew, Linux packages)
+Plan: 1 of 4 in current phase
+Status: In progress
+Last activity: 2026-02-26 -- Completed 06-01 GoReleaser and release automation
 
 Progress: [█████████░] 90% (7/8 phases complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18
+- Total plans completed: 19
 - Average duration: 6min
 - Total execution time: 1.7 hours
 
@@ -34,9 +34,10 @@ Progress: [█████████░] 90% (7/8 phases complete)
 | 5. Quick Connect | 2 | 5min | 3min |
 | 7. Kill Switch | 2 | 7min | 4min |
 | 8. Split Tunneling | 3 | 20min | 7min |
+| 6. Distribution | 1 | 2min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 5min, 7min, 6min, 7min
+- Last 5 plans: 5min, 7min, 6min, 7min, 2min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -110,6 +111,9 @@ Recent decisions affecting current work:
 - Status bar additions pulled into Task 1 for compilation when splitTunnelSavedMsg handler needs SetSplitTunnel (08-03)
 - extractBypassIPs skips wildcard rules -- cannot be resolved to specific IPs (08-03)
 - keyMap KillSwitch renamed to Menu -- pre-existing fix committed with Task 2 (08-03)
+- Single ldflags line with -s -w and version injection for GoReleaser simplicity (06-01)
+- GH_PAT secret instead of GITHUB_TOKEN to prepare for Homebrew tap cross-repo push (06-01)
+- tar.gz archive format for both macOS and Linux (06-01)
 
 ### Pending Todos
 
@@ -124,5 +128,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Updated Phase 6 scope -- expanded from 3 to 7 requirements (install script, Homebrew, Linux packages, GitHub Releases)
-Resume file: .planning/ROADMAP.md (Phase 6 section)
+Stopped at: Completed 06-01-PLAN.md (GoReleaser and release automation)
+Resume file: .planning/phases/06-distribution/06-01-SUMMARY.md
