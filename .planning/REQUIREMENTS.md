@@ -59,9 +59,13 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Distribution
 
-- [ ] **DIST-01**: App builds as single binary for macOS (amd64, arm64) and Linux (amd64, arm64)
-- [ ] **DIST-02**: App auto-downloads geoip.dat and geosite.dat on first run if not present
-- [ ] **DIST-03**: App provides --cleanup and --reset-terminal recovery commands
+- [ ] **DIST-01**: App builds as single binary for macOS (amd64, arm64) and Linux (amd64, arm64) via GoReleaser with size optimization
+- [ ] **DIST-02**: App auto-downloads geoip.dat and geosite.dat on first run if not present, with progress display and integrity check
+- [ ] **DIST-03**: App provides --cleanup and --reset-terminal recovery commands that work on both macOS and Linux
+- [ ] **DIST-04**: curl-pipe install script detects OS/arch, downloads correct binary, places in PATH, works on fresh machines
+- [ ] **DIST-05**: Homebrew tap formula (`brew install azad`) installs binary with proper metadata and completions
+- [ ] **DIST-06**: GitHub Releases include platform binaries, SHA256 checksums, and SBOM for each release
+- [ ] **DIST-07**: Linux packages available: .deb (APT), .rpm (DNF/YUM), AUR PKGBUILD, snap
 
 ### Kill Switch
 
@@ -150,6 +154,10 @@ Deferred to future release. Tracked but not in current roadmap.
 | DIST-01 | Phase 6 | Pending |
 | DIST-02 | Phase 6 | Pending |
 | DIST-03 | Phase 6 | Pending |
+| DIST-04 | Phase 6 | Pending |
+| DIST-05 | Phase 6 | Pending |
+| DIST-06 | Phase 6 | Pending |
+| DIST-07 | Phase 6 | Pending |
 | KILL-01 | Phase 7 | Complete |
 | KILL-02 | Phase 7 | Complete |
 | KILL-03 | Phase 7 | Complete |
@@ -163,8 +171,8 @@ Deferred to future release. Tracked but not in current roadmap.
 | SPLT-06 | Phase 8 | Complete |
 
 **Coverage:**
-- v1 requirements: 46 total
-- Mapped to phases: 46
+- v1 requirements: 50 total
+- Mapped to phases: 50
 - Unmapped: 0
 
 ---

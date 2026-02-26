@@ -17,9 +17,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Connection Engine** - Xray-core proxy lifecycle, system proxy, connection verification
 - [x] **Phase 4: TUI and Server Interaction** - Full interactive terminal UI with server list, ping, navigation, and server management
 - [x] **Phase 5: Quick Connect** - Zero-argument TUI launch, headless connect, session memory
-- [ ] **Phase 6: Distribution** - Cross-platform builds, geo asset management, recovery commands
+- [ ] **Phase 6: Distribution** - Cross-platform builds, installer script, Homebrew tap, Linux packages, geo asset auto-download
 - [x] **Phase 7: Kill Switch** - Firewall-based traffic blocking, terminal close guard, crash-safe recovery (completed 2026-02-26)
-- [ ] **Phase 8: Split Tunneling** - Route-based traffic splitting with inclusive/exclusive modes, IP and hostname rules
+- [x] **Phase 8: Split Tunneling** - Route-based traffic splitting with inclusive/exclusive modes, IP and hostname rules (completed 2026-02-26)
 
 ## Phase Details
 
@@ -104,17 +104,24 @@ Plans:
 - [x] 05-02-PLAN.md — TUI connection lifecycle: auto-connect, Enter/c connect, quit cleanup
 
 ### Phase 6: Distribution
-**Goal**: Users on macOS and Linux can install a single binary that handles first-run setup automatically
+**Goal**: Users on macOS and Linux can install azad with a single command (brew, curl, or package manager) and the binary handles all first-run setup automatically
 **Depends on**: Phase 5
-**Requirements**: DIST-01, DIST-02, DIST-03
+**Requirements**: DIST-01, DIST-02, DIST-03, DIST-04, DIST-05, DIST-06, DIST-07
 **Success Criteria** (what must be TRUE):
-  1. App builds as a single binary for macOS (amd64, arm64) and Linux (amd64, arm64) via GoReleaser
+  1. App builds as a single binary for macOS (amd64, arm64) and Linux (amd64, arm64) via GoReleaser with `-ldflags="-s -w"` for size optimization
   2. On first run, app auto-downloads geoip.dat and geosite.dat to the data directory without user intervention
   3. Recovery commands (--cleanup, --reset-terminal) work correctly on both macOS and Linux platforms
-**Plans**: TBD
+  4. `curl -sSL <install-url> | bash` detects OS/arch, downloads the correct binary, and places it in PATH -- works on fresh macOS and Linux machines
+  5. Homebrew tap (`brew install azad`) installs the binary with proper formula including dependencies and completions
+  6. GitHub Releases contain platform binaries, SHA256 checksums, and SBOM for each release
+  7. Linux packages available for major distros: .deb (APT), .rpm (DNF/YUM), AUR PKGBUILD, and snap
+**Plans**: 4 plans
 
 Plans:
-- [ ] 06-01: TBD
+- [ ] 06-01-PLAN.md — GoReleaser config: cross-platform builds (macOS/Linux x amd64/arm64), ldflags, checksums, SBOM, GitHub Release automation
+- [ ] 06-02-PLAN.md — Geo asset auto-download: first-run detection, download geoip.dat + geosite.dat with progress, retry logic, integrity verification
+- [ ] 06-03-PLAN.md — Install script + Homebrew tap: curl-pipe installer (OS/arch detection, PATH placement, verification), Homebrew formula with tap repo
+- [ ] 06-04-PLAN.md — Linux packages: .deb/.rpm via GoReleaser nfpm, AUR PKGBUILD, snap manifest, platform recovery command testing
 
 ### Phase 7: Kill Switch
 **Goal**: When enabled, all non-VPN traffic is blocked at the firewall level — if VPN drops or terminal closes, nothing leaks. User can always recover via `azad` or `azad --cleanup`.
@@ -162,6 +169,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 3. Connection Engine | 3/3 | Complete    | 2026-02-25 |
 | 4. TUI and Server Interaction | 4/4 | Complete | 2026-02-26 |
 | 5. Quick Connect | 2/2 | Complete    | 2026-02-26 |
-| 6. Distribution | 0/? | Not started | - |
-| 7. Kill Switch | 1/2 | Complete    | 2026-02-26 |
-| 8. Split Tunneling | 0/? | Not started | - |
+| 6. Distribution | 0/4 | Not started | - |
+| 7. Kill Switch | 2/2 | Complete    | 2026-02-26 |
+| 8. Split Tunneling | 3/3 | Complete    | 2026-02-26 |

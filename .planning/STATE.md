@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** One command to connect to the fastest VPN server through a stunning terminal interface
-**Current focus:** Phase 8: Split Tunneling
+**Current focus:** Phase 6: Distribution
 
 ## Current Position
 
-Phase: 8 of 8 (Split Tunneling)
-Plan: 3 of 3 in current phase
-Status: Phase 8 complete
-Last activity: 2026-02-26 -- Completed 08-03-PLAN.md
+Phase: 6 of 8 (Distribution)
+Plan: 0 of 4 in current phase
+Status: Not started
+Last activity: 2026-02-26 -- Updated Phase 6 scope (expanded: install script, Homebrew, Linux packages)
 
-Progress: [██████████] 100%
+Progress: [█████████░] 90% (7/8 phases complete)
 
 ## Performance Metrics
 
@@ -124,5 +124,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 08-03-PLAN.md (split tunnel TUI integration: management overlay, connect wiring, status bar indicator)
-Resume file: .planning/phases/08-split-tunneling/08-03-SUMMARY.md
+Stopped at: Updated Phase 6 scope -- expanded from 3 to 7 requirements (install script, Homebrew, Linux packages, GitHub Releases)
+Resume file: .planning/ROADMAP.md (Phase 6 section)
