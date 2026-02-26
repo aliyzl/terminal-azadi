@@ -19,6 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Quick Connect** - Zero-argument TUI launch, headless connect, session memory
 - [ ] **Phase 6: Distribution** - Cross-platform builds, geo asset management, recovery commands
 - [x] **Phase 7: Kill Switch** - Firewall-based traffic blocking, terminal close guard, crash-safe recovery (completed 2026-02-26)
+- [ ] **Phase 8: Split Tunneling** - Route-based traffic splitting with inclusive/exclusive modes, IP and hostname rules
 
 ## Phase Details
 
@@ -131,6 +132,24 @@ Plans:
 - [x] 07-01-PLAN.md — killswitch package (pf rules, privilege escalation, enable/disable API) + ProxyState extension + cleanup upgrade
 - [ ] 07-02-PLAN.md — Wire kill switch into CLI (--kill-switch flag), TUI (K keybinding toggle), startup recovery, status bar
 
+### Phase 8: Split Tunneling
+**Goal**: Windscribe-style split tunneling — users define which traffic goes through the VPN and which bypasses it, using IP addresses and hostnames in either inclusive (only listed routes go through VPN) or exclusive (everything except listed routes goes through VPN) mode
+**Depends on**: Phase 3 (Connection Engine), Phase 7 (Kill Switch — firewall rule coordination)
+**Requirements**: SPLT-01, SPLT-02, SPLT-03, SPLT-04, SPLT-05, SPLT-06
+**Success Criteria** (what must be TRUE):
+  1. User can define split tunnel rules using IPs (single, CIDR ranges) and hostnames (domains with optional wildcard like `*.google.com`)
+  2. **Inclusive mode** (VPN-only list): only traffic matching the rule list routes through VPN; everything else goes direct
+  3. **Exclusive mode** (bypass list): all traffic routes through VPN except traffic matching the rule list, which goes direct
+  4. Rules persist in config and survive app restarts; user can add/remove rules and switch modes through both TUI and CLI
+  5. Split tunneling works correctly alongside the kill switch — kill switch blocks leaked traffic, split tunnel routes allowed traffic
+  6. Hostname rules resolve correctly and update when DNS changes, without breaking the VPN connection
+**Plans**: 3 plans
+
+Plans:
+- [ ] 08-01-PLAN.md — splittunnel package (rule types, validation, Xray rule generation), Config extension, BuildConfig integration with TDD
+- [ ] 08-02-PLAN.md — Kill switch pf coordination (bypass IPs), Engine.Start wiring, CLI split-tunnel subcommand, connect flow integration
+- [ ] 08-03-PLAN.md — TUI split tunnel management (menu view, rule CRUD, mode toggle), status bar indicator, TUI connect wiring
+
 ## Progress
 
 **Execution Order:**
@@ -145,3 +164,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 5. Quick Connect | 2/2 | Complete    | 2026-02-26 |
 | 6. Distribution | 0/? | Not started | - |
 | 7. Kill Switch | 1/2 | Complete    | 2026-02-26 |
+| 8. Split Tunneling | 0/? | Not started | - |
