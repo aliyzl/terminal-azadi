@@ -166,6 +166,20 @@ func (s *Store) FindByID(id string) (*protocol.Server, bool) {
 	return nil, false
 }
 
+// UpdateServer replaces a server in the store by ID and saves atomically.
+func (s *Store) UpdateServer(updated protocol.Server) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	for i := range s.servers {
+		if s.servers[i].ID == updated.ID {
+			s.servers[i] = updated
+			return s.save()
+		}
+	}
+	return fmt.Errorf("server %q not found", updated.ID)
+}
+
 // Count returns the number of servers in the store.
 func (s *Store) Count() int {
 	s.mu.RLock()

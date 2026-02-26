@@ -164,6 +164,21 @@ func findServer(store *serverstore.Store, cfg *config.Config, args []string) (*p
 		}
 	}
 
+	// Try lowest latency server (positive LatencyMs only).
+	bestIdx := -1
+	bestLatency := 0
+	for i := range servers {
+		if servers[i].LatencyMs > 0 {
+			if bestIdx == -1 || servers[i].LatencyMs < bestLatency {
+				bestIdx = i
+				bestLatency = servers[i].LatencyMs
+			}
+		}
+	}
+	if bestIdx >= 0 {
+		return &servers[bestIdx], nil
+	}
+
 	// Fall back to first server.
 	return &servers[0], nil
 }
