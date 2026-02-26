@@ -65,6 +65,9 @@ type killSwitchResultMsg struct {
 	Err     error
 }
 
+// splitTunnelSavedMsg indicates split tunnel config was saved to disk.
+type splitTunnelSavedMsg struct{}
+
 // errMsg carries a generic error.
 type errMsg struct {
 	Err error

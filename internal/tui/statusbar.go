@@ -16,6 +16,7 @@ type statusBarModel struct {
 	width       int
 	styles      Styles
 	killSwitch  bool
+	splitTunnel bool
 }
 
 // Update refreshes the displayed connection state.
@@ -38,6 +39,11 @@ func (m *statusBarModel) SetSize(w int) {
 // SetKillSwitch sets the kill switch indicator state.
 func (m *statusBarModel) SetKillSwitch(active bool) {
 	m.killSwitch = active
+}
+
+// SetSplitTunnel sets the split tunnel indicator state.
+func (m *statusBarModel) SetSplitTunnel(active bool) {
+	m.splitTunnel = active
 }
 
 // SetStyles updates the styles used for rendering.
@@ -82,16 +88,25 @@ func (m statusBarModel) View() string {
 	// Kill switch indicator
 	var killSwitchDisplay string
 	if m.killSwitch {
-		killSwitchDisplay = m.styles.Warning.Bold(true).Render("KILL SW: ON")
+		killSwitchDisplay = m.styles.Error.Bold(true).Render(" ⛨ KILL SWITCH ON ")
+	}
+
+	// Split tunnel indicator
+	var splitTunnelDisplay string
+	if m.splitTunnel {
+		splitTunnelDisplay = m.styles.Accent.Bold(true).Render(" SPLIT ")
 	}
 
 	// Compose sections
 	sections := statusIndicator + "  " + serverDisplay + "  " + portDisplay
+	if uptimeDisplay != "" {
+		sections += "  " + uptimeDisplay
+	}
 	if killSwitchDisplay != "" {
 		sections += "  " + killSwitchDisplay
 	}
-	if uptimeDisplay != "" {
-		sections += "  " + uptimeDisplay
+	if splitTunnelDisplay != "" {
+		sections += "  " + splitTunnelDisplay
 	}
 
 	return m.styles.StatusBar.

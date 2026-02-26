@@ -3,6 +3,7 @@ package tui
 import (
 	"fmt"
 	"sort"
+	"strings"
 	"time"
 
 	"charm.land/bubbles/v2/list"
@@ -12,6 +13,7 @@ import (
 	"github.com/leejooy96/azad/internal/engine"
 	"github.com/leejooy96/azad/internal/killswitch"
 	"github.com/leejooy96/azad/internal/serverstore"
+	"github.com/leejooy96/azad/internal/splittunnel"
 )
 
 // viewState represents the current view mode of the TUI.
@@ -23,7 +25,10 @@ const (
 	viewAddServer
 	viewAddSubscription
 	viewConfirmDelete
+	viewMenu
 	viewConfirmKillSwitch
+	viewSplitTunnel
+	viewAddSplitRule
 )
 
 // Minimum terminal dimensions for usable layout.
@@ -53,6 +58,7 @@ type model struct {
 	pingLatencies    map[string]int // serverID -> latencyMs (-1 = error)
 	confirmDelete    bool
 	killSwitchActive bool
+	splitTunnelIdx   int // selected rule index in split tunnel view
 
 	// Shared references
 	store  *serverstore.Store
@@ -84,6 +90,11 @@ func New(store *serverstore.Store, eng *engine.Engine, cfg *config.Config) model
 	ksActive := killswitch.IsActive()
 	if ksActive {
 		sb.SetKillSwitch(true)
+	}
+
+	// Check if split tunneling is enabled in config.
+	if cfg.SplitTunnel.Enabled && len(cfg.SplitTunnel.Rules) > 0 {
+		sb.SetSplitTunnel(true)
 	}
 
 	return model{
@@ -123,20 +134,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.width = msg.Width
 		m.height = msg.Height
 		m.ready = true
-
-		listWidth := m.width / 3
-		contentHeight := m.height - statusBarHeight
-
-		// Size the server list panel
-		m.serverList.SetSize(listWidth, contentHeight)
-
-		// Size the detail panel (account for border taking 1 column)
-		detailWidth := m.width - listWidth - 1
-		m.detail.SetSize(detailWidth, contentHeight)
-
-		// Size the status bar
-		m.statusBar.SetSize(m.width)
-
+		m.resizeContent()
 		return m, nil
 
 	case tickMsg:
@@ -218,16 +216,26 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.statusBar.SetConnectedAt(time.Time{})
 		m.killSwitchActive = false
 		m.statusBar.SetKillSwitch(false)
+		if m.ready {
+			m.resizeContent()
+		}
 		return m, nil
 
 	case killSwitchResultMsg:
 		if msg.Err != nil {
-			// Flash error via input modal pattern.
 			m.input.err = msg.Err
 			return m, nil
 		}
 		m.killSwitchActive = msg.Enabled
 		m.statusBar.SetKillSwitch(msg.Enabled)
+		if m.ready {
+			m.resizeContent()
+		}
+		return m, nil
+
+	case splitTunnelSavedMsg:
+		// Config saved silently; update status bar to reflect new state.
+		m.statusBar.SetSplitTunnel(m.cfg.SplitTunnel.Enabled && len(m.cfg.SplitTunnel.Rules) > 0)
 		return m, nil
 
 	case errMsg:
@@ -238,7 +246,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case tea.PasteMsg:
-		if m.view == viewAddServer || m.view == viewAddSubscription {
+		if m.view == viewAddServer || m.view == viewAddSubscription || m.view == viewAddSplitRule {
 			var cmd tea.Cmd
 			m.input, cmd = m.input.Update(msg)
 			return m, cmd
@@ -251,7 +259,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	// Pass other messages to the active child model based on view state
 	var cmd tea.Cmd
-	if m.view == viewAddServer || m.view == viewAddSubscription {
+	if m.view == viewAddServer || m.view == viewAddSubscription || m.view == viewAddSplitRule {
 		m.input, cmd = m.input.Update(msg)
 	} else {
 		m.serverList, cmd = m.serverList.Update(msg)
@@ -321,13 +329,106 @@ func (m model) handleKeyPress(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		}
 		return m, nil
 
+	case viewMenu:
+		switch key {
+		case "enter", " ":
+			if m.killSwitchActive {
+				m.view = viewNormal
+				return m, disableKillSwitchCmd()
+			}
+			m.view = viewConfirmKillSwitch
+			return m, nil
+		case "t":
+			m.view = viewSplitTunnel
+			m.splitTunnelIdx = 0
+			return m, nil
+		case "esc", "m":
+			m.view = viewNormal
+			return m, nil
+		}
+		return m, nil
+
+	case viewSplitTunnel:
+		switch key {
+		case "esc":
+			m.view = viewMenu
+			return m, nil
+		case "j", "down":
+			ruleCount := len(m.cfg.SplitTunnel.Rules)
+			if ruleCount > 0 && m.splitTunnelIdx < ruleCount-1 {
+				m.splitTunnelIdx++
+			}
+			return m, nil
+		case "k", "up":
+			if m.splitTunnelIdx > 0 {
+				m.splitTunnelIdx--
+			}
+			return m, nil
+		case "a":
+			m.view = viewAddSplitRule
+			cmd := m.input.SetMode(inputAddSplitRule)
+			return m, cmd
+		case "d":
+			ruleCount := len(m.cfg.SplitTunnel.Rules)
+			if ruleCount > 0 && m.splitTunnelIdx < ruleCount {
+				m.cfg.SplitTunnel.Rules = append(
+					m.cfg.SplitTunnel.Rules[:m.splitTunnelIdx],
+					m.cfg.SplitTunnel.Rules[m.splitTunnelIdx+1:]...,
+				)
+				if m.splitTunnelIdx >= len(m.cfg.SplitTunnel.Rules) && m.splitTunnelIdx > 0 {
+					m.splitTunnelIdx--
+				}
+				return m, saveSplitTunnelCmd(m.cfg)
+			}
+			return m, nil
+		case "e":
+			m.cfg.SplitTunnel.Enabled = !m.cfg.SplitTunnel.Enabled
+			m.statusBar.SetSplitTunnel(m.cfg.SplitTunnel.Enabled && len(m.cfg.SplitTunnel.Rules) > 0)
+			return m, saveSplitTunnelCmd(m.cfg)
+		case "t":
+			if m.cfg.SplitTunnel.Mode == "inclusive" {
+				m.cfg.SplitTunnel.Mode = "exclusive"
+			} else {
+				m.cfg.SplitTunnel.Mode = "inclusive"
+			}
+			return m, saveSplitTunnelCmd(m.cfg)
+		}
+		return m, nil
+
+	case viewAddSplitRule:
+		switch key {
+		case "esc":
+			m.view = viewSplitTunnel
+			return m, nil
+		case "enter":
+			value := m.input.Value()
+			if value == "" {
+				return m, nil
+			}
+			rule, err := splittunnel.ParseRule(value)
+			if err != nil {
+				m.input.err = err
+				return m, nil
+			}
+			m.cfg.SplitTunnel.Rules = append(m.cfg.SplitTunnel.Rules, config.SplitTunnelRule{
+				Value: rule.Value,
+				Type:  string(rule.Type),
+			})
+			m.view = viewSplitTunnel
+			return m, saveSplitTunnelCmd(m.cfg)
+		default:
+			var cmd tea.Cmd
+			m.input, cmd = m.input.Update(msg)
+			return m, cmd
+		}
+
 	case viewConfirmKillSwitch:
 		switch key {
 		case "y", "enter":
 			m.view = viewNormal
 			return m, enableKillSwitchCmd(m.engine, m.cfg)
 		case "n", "esc":
-			m.view = viewNormal
+			m.view = viewMenu
 			return m, nil
 		}
 		return m, nil
@@ -379,13 +480,8 @@ func (m model) handleKeyPress(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 			m.view = viewConfirmDelete
 			return m, nil
 
-		case "K":
-			if m.killSwitchActive {
-				// Disable directly without confirmation.
-				return m, disableKillSwitchCmd()
-			}
-			// Show confirmation overlay before enabling.
-			m.view = viewConfirmKillSwitch
+		case "m":
+			m.view = viewMenu
 			return m, nil
 
 		case "p":
@@ -452,6 +548,21 @@ func (m *model) syncDetail() {
 	if item, ok := m.serverList.SelectedItem().(serverItem); ok {
 		m.detail.SetServer(&item.server)
 	}
+}
+
+// resizeContent recalculates child model sizes based on current dimensions
+// and kill switch banner visibility.
+func (m *model) resizeContent() {
+	bannerH := 0
+	if m.killSwitchActive {
+		bannerH = 1
+	}
+	listWidth := m.width / 3
+	contentHeight := m.height - statusBarHeight - bannerH
+	m.serverList.SetSize(listWidth, contentHeight)
+	detailWidth := m.width - listWidth - 1
+	m.detail.SetSize(detailWidth, contentHeight)
+	m.statusBar.SetSize(m.width)
 }
 
 // reloadServers refreshes the list items from the store, preserving the
@@ -533,9 +644,23 @@ func (m model) View() tea.View {
 		return v
 	}
 
+	// Kill switch active banner
+	var bannerHeight int
+	var banner string
+	if m.killSwitchActive {
+		bannerHeight = 1
+		banner = lipgloss.NewStyle().
+			Background(DefaultTheme.Error.Dark).
+			Foreground(lipgloss.Color("255")).
+			Bold(true).
+			Width(m.width).
+			Align(lipgloss.Center).
+			Render("⛨  KILL SWITCH ACTIVE — All non-VPN traffic blocked")
+	}
+
 	listWidth := m.width / 3
 	detailWidth := m.width - listWidth - 1
-	contentHeight := m.height - statusBarHeight
+	contentHeight := m.height - statusBarHeight - bannerHeight
 
 	// Style the list panel with a right border
 	listStyle := lipgloss.NewStyle().
@@ -557,16 +682,68 @@ func (m model) View() tea.View {
 	// Compose horizontal layout
 	main := lipgloss.JoinHorizontal(lipgloss.Top, listPanel, detailPanel)
 
-	// Add status bar below
-	content := lipgloss.JoinVertical(lipgloss.Left, main, m.statusBar.View())
+	// Compose vertical layout with optional kill switch banner
+	var content string
+	if banner != "" {
+		content = lipgloss.JoinVertical(lipgloss.Left, banner, main, m.statusBar.View())
+	} else {
+		content = lipgloss.JoinVertical(lipgloss.Left, main, m.statusBar.View())
+	}
 
 	// Overlay modals based on view state
 	switch m.view {
 	case viewHelp:
 		content = m.help.Render(content, m.width, m.height)
 
-	case viewAddServer, viewAddSubscription:
+	case viewAddServer, viewAddSubscription, viewAddSplitRule:
 		content = m.input.View(m.width, m.height)
+
+	case viewMenu:
+		titleStyle := lipgloss.NewStyle().Foreground(DefaultTheme.Accent.Dark).Bold(true)
+		dimStyle := lipgloss.NewStyle().Foreground(DefaultTheme.Border.Dark)
+
+		title := titleStyle.Render("Settings")
+
+		ksIcon := "\u26E8  Kill Switch"
+		var ksStatus string
+		if m.killSwitchActive {
+			ksStatus = lipgloss.NewStyle().Foreground(DefaultTheme.Success.Dark).Bold(true).Render("\u25CF ACTIVE")
+		} else {
+			ksStatus = dimStyle.Render("\u25CB OFF")
+		}
+
+		innerWidth := 36
+		padLen := innerWidth - lipgloss.Width(ksIcon) - lipgloss.Width(ksStatus)
+		if padLen < 2 {
+			padLen = 2
+		}
+		ksRow := ksIcon + strings.Repeat(" ", padLen) + ksStatus
+
+		// Split tunnel row
+		stIcon := "\u21C4  Split Tunnel"
+		var stStatus string
+		if m.cfg.SplitTunnel.Enabled && len(m.cfg.SplitTunnel.Rules) > 0 {
+			stStatus = lipgloss.NewStyle().Foreground(DefaultTheme.Success.Dark).Bold(true).Render("\u25CF ENABLED")
+		} else {
+			stStatus = dimStyle.Render("\u25CB OFF")
+		}
+		stPadLen := innerWidth - lipgloss.Width(stIcon) - lipgloss.Width(stStatus)
+		if stPadLen < 2 {
+			stPadLen = 2
+		}
+		stRow := stIcon + strings.Repeat(" ", stPadLen) + stStatus
+
+		hint := dimStyle.Render("enter \u00b7 toggle KS    t \u00b7 split tunnel    esc \u00b7 close")
+
+		inner := title + "\n\n" + ksRow + "\n" + stRow + "\n\n" + hint
+		menuBox := lipgloss.NewStyle().
+			Border(lipgloss.RoundedBorder()).
+			BorderForeground(DefaultTheme.Accent.Dark).
+			Padding(1, 3).
+			Width(52).
+			Align(lipgloss.Center).
+			Render(inner)
+		content = lipgloss.Place(m.width, m.height, lipgloss.Center, lipgloss.Center, menuBox)
 
 	case viewConfirmDelete:
 		confirmBox := lipgloss.NewStyle().
@@ -578,13 +755,26 @@ func (m model) View() tea.View {
 		content = lipgloss.Place(m.width, m.height, lipgloss.Center, lipgloss.Center, confirmBox)
 
 	case viewConfirmKillSwitch:
+		warnStyle := lipgloss.NewStyle().Foreground(DefaultTheme.Warning.Dark).Bold(true)
+		dimStyle := lipgloss.NewStyle().Foreground(DefaultTheme.Border.Dark)
+		successStyle := lipgloss.NewStyle().Foreground(DefaultTheme.Success.Dark).Bold(true)
+
+		title := warnStyle.Render("KILL SWITCH")
+		body := "When enabled, ALL non-VPN traffic\nis blocked at the firewall level.\n\nIf VPN drops or terminal closes,\nnothing leaks — internet stays blocked\nuntil you reconnect or run cleanup."
+		note := dimStyle.Render("Requires administrator password.")
+		buttons := successStyle.Render("[Y] Enable") + "    " + dimStyle.Render("[N] Cancel")
+		inner := title + "\n\n" + body + "\n\n" + note + "\n\n" + buttons
 		confirmBox := lipgloss.NewStyle().
-			Border(lipgloss.RoundedBorder()).
+			Border(lipgloss.DoubleBorder()).
 			BorderForeground(DefaultTheme.Warning.Dark).
-			Padding(1, 2).
-			Width(44).
-			Render("Enable kill switch?\n\nThis blocks ALL non-VPN traffic.\nRequires admin password.\n\n(y) Yes  (n) No")
+			Padding(1, 3).
+			Width(46).
+			Align(lipgloss.Center).
+			Render(inner)
 		content = lipgloss.Place(m.width, m.height, lipgloss.Center, lipgloss.Center, confirmBox)
+
+	case viewSplitTunnel:
+		content = renderSplitTunnelView(m)
 	}
 
 	v := tea.NewView(content)

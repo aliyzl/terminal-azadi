@@ -17,6 +17,7 @@ type inputMode int
 const (
 	inputAddServer inputMode = iota
 	inputAddSubscription
+	inputAddSplitRule
 )
 
 // inputModel wraps a text input for server URI and subscription URL entry.
@@ -52,6 +53,8 @@ func (m *inputModel) SetMode(mode inputMode) tea.Cmd {
 		m.textInput.Placeholder = "Paste server URI (vless://, vmess://, trojan://, ss://)"
 	case inputAddSubscription:
 		m.textInput.Placeholder = "Paste subscription URL (https://...)"
+	case inputAddSplitRule:
+		m.textInput.Placeholder = "IP, CIDR, domain, or *.domain"
 	}
 
 	return m.textInput.Focus()
@@ -75,8 +78,11 @@ func (m inputModel) Value() string {
 // error display, and hint text.
 func (m inputModel) View(width, height int) string {
 	title := "Add Server"
-	if m.mode == inputAddSubscription {
+	switch m.mode {
+	case inputAddSubscription:
 		title = "Add Subscription"
+	case inputAddSplitRule:
+		title = "Add Split Tunnel Rule"
 	}
 
 	titleStyle := lipgloss.NewStyle().
