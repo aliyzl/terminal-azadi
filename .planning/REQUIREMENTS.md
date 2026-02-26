@@ -60,8 +60,8 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Distribution
 
 - [x] **DIST-01**: App builds as single binary for macOS (amd64, arm64) and Linux (amd64, arm64) via GoReleaser with size optimization
-- [ ] **DIST-02**: App auto-downloads geoip.dat and geosite.dat on first run if not present, with progress display and integrity check
-- [ ] **DIST-03**: App provides --cleanup and --reset-terminal recovery commands that work on both macOS and Linux
+- [x] **DIST-02**: App auto-downloads geoip.dat and geosite.dat on first run if not present, with progress display and integrity check
+- [x] **DIST-03**: App provides --cleanup and --reset-terminal recovery commands that work on both macOS and Linux
 - [ ] **DIST-04**: curl-pipe install script detects OS/arch, downloads correct binary, places in PATH, works on fresh machines
 - [ ] **DIST-05**: Homebrew tap formula (`brew install azad`) installs binary with proper metadata and completions
 - [x] **DIST-06**: GitHub Releases include platform binaries, SHA256 checksums, and SBOM for each release
@@ -152,8 +152,8 @@ Deferred to future release. Tracked but not in current roadmap.
 | QCON-02 | Phase 5 | Complete |
 | QCON-03 | Phase 5 | Complete |
 | DIST-01 | Phase 6 | Complete |
-| DIST-02 | Phase 6 | Pending |
-| DIST-03 | Phase 6 | Pending |
+| DIST-02 | Phase 6 | Complete |
+| DIST-03 | Phase 6 | Complete |
 | DIST-04 | Phase 6 | Pending |
 | DIST-05 | Phase 6 | Pending |
 | DIST-06 | Phase 6 | Complete |
