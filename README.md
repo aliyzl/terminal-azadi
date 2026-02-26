@@ -4,8 +4,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/leejooy96/azad/releases/latest"><img src="https://img.shields.io/github/v/release/leejooy96/azad?style=flat-square" alt="Release"></a>
-  <a href="https://github.com/leejooy96/azad/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License"></a>
+  <a href="https://github.com/aliyzl/terminal-azadi/releases/latest"><img src="https://img.shields.io/github/v/release/aliyzl/terminal-azadi?style=flat-square" alt="Release"></a>
+  <a href="https://github.com/aliyzl/terminal-azadi/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License"></a>
   <img src="https://img.shields.io/badge/go-1.25+-00ADD8?style=flat-square&logo=go" alt="Go">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey?style=flat-square" alt="Platform">
 </p>
@@ -37,7 +37,7 @@ Azad is a keyboard-driven terminal VPN client that wraps [Xray-core](https://git
 
 ```bash
 # Install
-curl -sSL https://github.com/leejooy96/azad/releases/latest/download/install.sh | sh
+curl -sSL https://github.com/aliyzl/terminal-azadi/releases/latest/download/install.sh | sh
 
 # Launch
 azad
@@ -83,8 +83,8 @@ snap install azad --classic
 ### Build from Source
 
 ```bash
-git clone https://github.com/leejooy96/azad.git
-cd azad
+git clone https://github.com/aliyzl/terminal-azadi.git
+cd terminal-azadi
 go build -ldflags="-s -w" ./cmd/azad
 ./azad
 ```
