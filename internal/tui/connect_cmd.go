@@ -15,16 +15,17 @@ import (
 	"github.com/leejooy96/azad/internal/lifecycle"
 	"github.com/leejooy96/azad/internal/protocol"
 	"github.com/leejooy96/azad/internal/serverstore"
+	"github.com/leejooy96/azad/internal/splittunnel"
 	"github.com/leejooy96/azad/internal/sysproxy"
 )
 
 // connectServerCmd returns a tea.Cmd that runs the full connection flow
 // for a specific server: start engine, set system proxy, write state,
-// persist preferences.
-func connectServerCmd(srv protocol.Server, eng *engine.Engine, cfg *config.Config, store *serverstore.Store) tea.Cmd {
+// persist preferences. splitCfg is passed to the engine for split tunnel routing.
+func connectServerCmd(srv protocol.Server, eng *engine.Engine, cfg *config.Config, store *serverstore.Store, splitCfg *splittunnel.Config) tea.Cmd {
 	return func() tea.Msg {
-		// Start the proxy engine.
-		if err := eng.Start(context.Background(), srv, cfg.Proxy.SOCKSPort, cfg.Proxy.HTTPPort); err != nil {
+		// Start the proxy engine with optional split tunnel config.
+		if err := eng.Start(context.Background(), srv, cfg.Proxy.SOCKSPort, cfg.Proxy.HTTPPort, splitCfg); err != nil {
 			return connectResultMsg{Err: err}
 		}
 
@@ -89,7 +90,8 @@ func disconnectCmd(eng *engine.Engine, ksActive ...bool) tea.Cmd {
 
 // autoConnectCmd returns a tea.Cmd that resolves the best server and
 // connects on TUI startup. If the store is empty, it silently skips.
-func autoConnectCmd(store *serverstore.Store, eng *engine.Engine, cfg *config.Config) tea.Cmd {
+// splitCfg is passed to the engine for split tunnel routing.
+func autoConnectCmd(store *serverstore.Store, eng *engine.Engine, cfg *config.Config, splitCfg *splittunnel.Config) tea.Cmd {
 	return func() tea.Msg {
 		servers := store.List()
 		if len(servers) == 0 {
@@ -99,8 +101,8 @@ func autoConnectCmd(store *serverstore.Store, eng *engine.Engine, cfg *config.Co
 		// Resolve best server: LastUsed > lowest positive LatencyMs > first.
 		server := resolveBestServer(servers, cfg, store)
 
-		// Start the proxy engine.
-		if err := eng.Start(context.Background(), *server, cfg.Proxy.SOCKSPort, cfg.Proxy.HTTPPort); err != nil {
+		// Start the proxy engine with optional split tunnel config.
+		if err := eng.Start(context.Background(), *server, cfg.Proxy.SOCKSPort, cfg.Proxy.HTTPPort, splitCfg); err != nil {
 			return autoConnectMsg{Err: err}
 		}
 
@@ -163,7 +165,12 @@ func resolveBestServer(servers []protocol.Server, cfg *config.Config, store *ser
 
 // enableKillSwitchCmd returns a tea.Cmd that enables the kill switch.
 // It resolves the connected server IP and calls killswitch.Enable.
-func enableKillSwitchCmd(eng *engine.Engine, cfg *config.Config) tea.Cmd {
+// bypassIPs are optional IPs/CIDRs to allow direct traffic (split tunnel coordination).
+func enableKillSwitchCmd(eng *engine.Engine, cfg *config.Config, bypassIPs ...[]string) tea.Cmd {
+	var bypass []string
+	if len(bypassIPs) > 0 {
+		bypass = bypassIPs[0]
+	}
 	return func() tea.Msg {
 		_, srv, _ := eng.Status()
 		if srv == nil {
@@ -176,7 +183,7 @@ func enableKillSwitchCmd(eng *engine.Engine, cfg *config.Config) tea.Cmd {
 			resolvedIP = ips[0]
 		}
 
-		if err := killswitch.Enable(resolvedIP, srv.Port); err != nil {
+		if err := killswitch.Enable(resolvedIP, srv.Port, bypass); err != nil {
 			return killSwitchResultMsg{Err: err}
 		}
 
@@ -185,6 +192,34 @@ func enableKillSwitchCmd(eng *engine.Engine, cfg *config.Config) tea.Cmd {
 
 		return killSwitchResultMsg{Enabled: true}
 	}
+}
+
+// extractBypassIPs returns IP/CIDR rules from the split tunnel config
+// when active in exclusive mode. Returns nil if inactive or inclusive mode.
+// Domain rules are resolved best-effort.
+func extractBypassIPs(cfg *config.Config) []string {
+	if !cfg.SplitTunnel.Enabled || len(cfg.SplitTunnel.Rules) == 0 {
+		return nil
+	}
+	if cfg.SplitTunnel.Mode == "inclusive" {
+		return nil
+	}
+	// Exclusive mode: listed rules bypass VPN, so they need pf exceptions.
+	var ips []string
+	for _, r := range cfg.SplitTunnel.Rules {
+		switch splittunnel.RuleType(r.Type) {
+		case splittunnel.RuleTypeIP, splittunnel.RuleTypeCIDR:
+			ips = append(ips, r.Value)
+		case splittunnel.RuleTypeDomain:
+			// Best-effort DNS resolution.
+			if resolved, err := net.LookupHost(r.Value); err == nil {
+				ips = append(ips, resolved...)
+			}
+		case splittunnel.RuleTypeWildcard:
+			// Wildcards cannot be resolved meaningfully; skip.
+		}
+	}
+	return ips
 }
 
 // disableKillSwitchCmd returns a tea.Cmd that disables the kill switch.

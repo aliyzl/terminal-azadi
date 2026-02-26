@@ -122,7 +122,8 @@ func tickCmd() tea.Cmd {
 
 // Init starts the uptime ticker and fires auto-connect on startup.
 func (m model) Init() tea.Cmd {
-	return tea.Batch(tickCmd(), autoConnectCmd(m.store, m.engine, m.cfg))
+	sc := buildSplitTunnelConfig(m.cfg)
+	return tea.Batch(tickCmd(), autoConnectCmd(m.store, m.engine, m.cfg, sc))
 }
 
 // Update handles messages and routes them to appropriate handlers.
@@ -426,7 +427,8 @@ func (m model) handleKeyPress(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		switch key {
 		case "y", "enter":
 			m.view = viewNormal
-			return m, enableKillSwitchCmd(m.engine, m.cfg)
+			bypass := extractBypassIPs(m.cfg)
+			return m, enableKillSwitchCmd(m.engine, m.cfg, bypass)
 		case "n", "esc":
 			m.view = viewMenu
 			return m, nil
@@ -500,13 +502,14 @@ func (m model) handleKeyPress(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 
 		case "enter", "c":
 			if item, ok := m.serverList.SelectedItem().(serverItem); ok {
+				sc := buildSplitTunnelConfig(m.cfg)
 				status, _, _ := m.engine.Status()
 				if status == engine.StatusConnected || status == engine.StatusConnecting {
 					// Already connected: disconnect first, then reconnect.
-					return m, tea.Sequence(disconnectCmd(m.engine), connectServerCmd(item.server, m.engine, m.cfg, m.store))
+					return m, tea.Sequence(disconnectCmd(m.engine), connectServerCmd(item.server, m.engine, m.cfg, m.store, sc))
 				}
 				m.statusBar.Update(engine.StatusConnecting, item.server.Name, m.cfg.Proxy.SOCKSPort)
-				return m, connectServerCmd(item.server, m.engine, m.cfg, m.store)
+				return m, connectServerCmd(item.server, m.engine, m.cfg, m.store, sc)
 			}
 			return m, nil
 

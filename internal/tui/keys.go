@@ -19,9 +19,9 @@ type keyMap struct {
 	AddSub     key.Binding
 	RefreshSub key.Binding
 	Delete     key.Binding
-	ClearAll   key.Binding
-	Connect    key.Binding
-	KillSwitch key.Binding
+	ClearAll key.Binding
+	Connect  key.Binding
+	Menu     key.Binding
 }
 
 // defaultKeyMap returns the default set of keybindings.
@@ -83,9 +83,9 @@ func defaultKeyMap() keyMap {
 			key.WithKeys("enter", "c"),
 			key.WithHelp("enter/c", "connect"),
 		),
-		KillSwitch: key.NewBinding(
-			key.WithKeys("K"),
-			key.WithHelp("K", "kill switch"),
+		Menu: key.NewBinding(
+			key.WithKeys("m"),
+			key.WithHelp("m", "menu"),
 		),
 	}
 }
@@ -101,6 +101,6 @@ func (k keyMap) FullHelp() [][]key.Binding {
 		{k.Up, k.Down, k.Select, k.Back},
 		{k.Filter, k.PingAll, k.Connect},
 		{k.AddServer, k.AddSub, k.RefreshSub},
-		{k.Delete, k.ClearAll, k.KillSwitch, k.Quit, k.Help},
+		{k.Delete, k.ClearAll, k.Menu, k.Quit, k.Help},
 	}
 }
