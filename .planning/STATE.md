@@ -10,16 +10,16 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 6 of 8 (Distribution)
-Plan: 2 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-26 -- Completed 06-02 Geo asset auto-download and platform-gated cleanup
+Last activity: 2026-02-26 -- Completed 06-03 Install script and Homebrew tap
 
 Progress: [█████████░] 90% (7/8 phases complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20
+- Total plans completed: 21
 - Average duration: 6min
 - Total execution time: 1.8 hours
 
@@ -34,10 +34,10 @@ Progress: [█████████░] 90% (7/8 phases complete)
 | 5. Quick Connect | 2 | 5min | 3min |
 | 7. Kill Switch | 2 | 7min | 4min |
 | 8. Split Tunneling | 3 | 20min | 7min |
-| 6. Distribution | 2 | 5min | 3min |
+| 6. Distribution | 3 | 7min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 7min, 6min, 7min, 2min, 3min
+- Last 5 plans: 6min, 7min, 2min, 3min, 2min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -116,6 +116,9 @@ Recent decisions affecting current work:
 - tar.gz archive format for both macOS and Linux (06-01)
 - Package-level var httpClient and Assets slice for test overridability without interfaces (06-02)
 - runtime.GOOS conditional in cleanup.go preserves macOS behavior, adds Linux messages (06-02)
+- POSIX sh (not bash) for install script maximum portability across macOS and Linux (06-03)
+- Fallback from /usr/local/bin to ~/.local/bin when no sudo available (06-03)
+- Conditional skip_upload in brews for snapshot builds only (06-03)
 
 ### Pending Todos
 
@@ -130,5 +133,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 06-02-PLAN.md (Geo asset auto-download and platform-gated cleanup)
-Resume file: .planning/phases/06-distribution/06-02-SUMMARY.md
+Stopped at: Completed 06-03-PLAN.md (Install script and Homebrew tap)
+Resume file: .planning/phases/06-distribution/06-03-SUMMARY.md
