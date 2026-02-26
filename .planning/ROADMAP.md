@@ -125,5 +125,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 2. Protocol Parsing | 2/2 | Complete    | 2026-02-24 |
 | 3. Connection Engine | 3/3 | Complete    | 2026-02-25 |
 | 4. TUI and Server Interaction | 4/4 | Complete | 2026-02-26 |
-| 5. Quick Connect | 2/2 | Complete | 2026-02-26 |
+| 5. Quick Connect | 2/2 | Complete    | 2026-02-26 |
 | 6. Distribution | 0/? | Not started | - |
