@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/leejooy96/azad/internal/config"
 	"github.com/leejooy96/azad/internal/engine"
@@ -101,6 +102,17 @@ func runConnect(cmd *cobra.Command, args []string) error {
 		}
 	} else {
 		fmt.Printf("Warning: Could not verify connection: %v\n", verifyErr)
+	}
+
+	// Persist connection preferences (non-fatal on failure).
+	cfg.Server.LastUsed = server.ID
+	if err := config.Save(cfg, configPath); err != nil {
+		fmt.Printf("Warning: could not save config: %v\n", err)
+	}
+
+	server.LastConnected = time.Now()
+	if err := store.UpdateServer(*server); err != nil {
+		fmt.Printf("Warning: could not update server: %v\n", err)
 	}
 
 	fmt.Printf("Status: %s | Server: %s | Press Ctrl+C to disconnect\n",
