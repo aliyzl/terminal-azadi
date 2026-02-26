@@ -37,7 +37,7 @@ Azad is a keyboard-driven terminal VPN client that wraps [Xray-core](https://git
 
 ```bash
 # Install
-curl -sSL https://github.com/aliyzl/terminal-azadi/releases/latest/download/install.sh | sh
+curl -sSL https://raw.githubusercontent.com/aliyzl/terminal-azadi/master/scripts/install.sh | sh
 
 # Launch
 azad
@@ -50,7 +50,7 @@ Then press `a` to add a server URI or `s` to add a subscription URL.
 ### Homebrew (macOS / Linux)
 
 ```bash
-brew tap leejooy96/tap
+brew tap aliyzl/tap
 brew install azad
 ```
 

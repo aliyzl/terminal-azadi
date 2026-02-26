@@ -1,9 +1,9 @@
 #!/bin/sh
 # Install script for azad - Beautiful terminal VPN client
-# Usage: curl -sSL https://raw.githubusercontent.com/leejooy96/azad/master/scripts/install.sh | sh
+# Usage: curl -sSL https://raw.githubusercontent.com/aliyzl/terminal-azadi/master/scripts/install.sh | sh
 set -e
 
-REPO="leejooy96/azad"
+REPO="aliyzl/terminal-azadi"
 BINARY="azad"
 
 # --- OS Detection ---

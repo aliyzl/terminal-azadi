@@ -49,16 +49,16 @@ changelog:
 
 release:
   github:
-    owner: leejooy96
-    name: azad
+    owner: aliyzl
+    name: terminal-azadi
   name_template: "Azad v{{.Version}}"
 
 brews:
   - repository:
-      owner: leejooy96
+      owner: aliyzl
       name: homebrew-tap
     directory: Formula
-    homepage: https://github.com/leejooy96/azad
+    homepage: https://github.com/aliyzl/terminal-azadi
     description: "Beautiful terminal VPN client — one command to connect to the fastest server"
     license: MIT
     skip_upload: "{{ if .IsSnapshot }}true{{ end }}"
@@ -73,9 +73,9 @@ nfpms:
   - id: azad-linux
     package_name: azad
     file_name_template: "{{ .ConventionalFileName }}"
-    vendor: leejooy96
-    homepage: https://github.com/leejooy96/azad
-    maintainer: leejooy96
+    vendor: aliyzl
+    homepage: https://github.com/aliyzl/terminal-azadi
+    maintainer: aliyzl
     description: "Beautiful terminal VPN client — one command to connect to the fastest server"
     license: MIT
     formats:
@@ -93,10 +93,10 @@ nfpms:
 # AUR_KEY SSH private key must be configured as a CI secret
 aurs:
   - name: azad-bin
-    homepage: https://github.com/leejooy96/azad
+    homepage: https://github.com/aliyzl/terminal-azadi
     description: "Beautiful terminal VPN client — one command to connect to the fastest server"
     maintainers:
-      - "leejooy96"
+      - "aliyzl"
     license: MIT
     private_key: "{{ .Env.AUR_KEY }}"
     git_url: "ssh://aur@aur.archlinux.org/azad-bin.git"
