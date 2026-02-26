@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 8 of 8 (Split Tunneling)
-Plan: 2 of 3 in current phase
-Status: Executing phase 8
-Last activity: 2026-02-26 -- Completed 08-02-PLAN.md
+Plan: 3 of 3 in current phase
+Status: Phase 8 complete
+Last activity: 2026-02-26 -- Completed 08-03-PLAN.md
 
-Progress: [█████████░] 85%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17
+- Total plans completed: 18
 - Average duration: 6min
-- Total execution time: 1.58 hours
+- Total execution time: 1.7 hours
 
 **By Phase:**
 
@@ -33,10 +33,10 @@ Progress: [█████████░] 85%
 | 4. TUI & Server Interaction | 4 | 13min | 3min |
 | 5. Quick Connect | 2 | 5min | 3min |
 | 7. Kill Switch | 2 | 7min | 4min |
-| 8. Split Tunneling | 2 | 13min | 7min |
+| 8. Split Tunneling | 3 | 20min | 7min |
 
 **Recent Trend:**
-- Last 5 plans: 3min, 2min, 5min, 7min, 6min
+- Last 5 plans: 2min, 5min, 7min, 6min, 7min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -107,6 +107,9 @@ Recent decisions affecting current work:
 - Variadic params on Enable and Engine.Start for zero-breaking-change API evolution (08-02)
 - strings.Builder in GenerateRules for dynamic bypass IP injection (08-02)
 - loadConfig helper extracted in split_tunnel.go for DRY CLI config pattern (08-02)
+- Status bar additions pulled into Task 1 for compilation when splitTunnelSavedMsg handler needs SetSplitTunnel (08-03)
+- extractBypassIPs skips wildcard rules -- cannot be resolved to specific IPs (08-03)
+- keyMap KillSwitch renamed to Menu -- pre-existing fix committed with Task 2 (08-03)
 
 ### Pending Todos
 
@@ -121,5 +124,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 08-02-PLAN.md (split tunnel wiring: kill switch bypass IPs, Engine.Start config, CLI subcommand)
-Resume file: .planning/phases/08-split-tunneling/08-02-SUMMARY.md
+Stopped at: Completed 08-03-PLAN.md (split tunnel TUI integration: management overlay, connect wiring, status bar indicator)
+Resume file: .planning/phases/08-split-tunneling/08-03-SUMMARY.md
