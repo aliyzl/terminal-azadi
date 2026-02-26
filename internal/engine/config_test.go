@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/leejooy96/azad/internal/protocol"
+	"github.com/leejooy96/azad/internal/splittunnel"
 
 	// Register all xray-core protocol handlers and JSON config loader.
 	_ "github.com/xtls/xray-core/main/distro/all"
@@ -657,4 +658,127 @@ func TestBuildConfigDefaults(t *testing.T) {
 	if ss.RealitySettings.Fingerprint != "chrome" {
 		t.Errorf("default fingerprint = %q, want chrome", ss.RealitySettings.Fingerprint)
 	}
+}
+
+// TestBuildConfigSplitTunnel tests BuildConfig with split tunnel configurations.
+func TestBuildConfigSplitTunnel(t *testing.T) {
+	baseSrv := protocol.Server{
+		Protocol: protocol.ProtocolVLESS,
+		Address:  "example.com",
+		Port:     443,
+		UUID:     "split-test-uuid",
+		Network:  "tcp",
+		TLS:      "none",
+	}
+
+	t.Run("nil split config behaves as before", func(t *testing.T) {
+		xrayCfg, coreConfig, err := BuildConfig(baseSrv, 1080, 8080, nil)
+		if err != nil {
+			t.Fatalf("BuildConfig error: %v", err)
+		}
+		if coreConfig == nil {
+			t.Fatal("coreConfig is nil")
+		}
+		// Outbound order: proxy first, direct second
+		if len(xrayCfg.Outbounds) < 2 {
+			t.Fatal("expected at least 2 outbounds")
+		}
+		if xrayCfg.Outbounds[0].Tag != "proxy" {
+			t.Errorf("first outbound tag = %q, want proxy", xrayCfg.Outbounds[0].Tag)
+		}
+		if xrayCfg.Outbounds[1].Tag != "direct" {
+			t.Errorf("second outbound tag = %q, want direct", xrayCfg.Outbounds[1].Tag)
+		}
+		// Domain strategy should be AsIs (no domain rules)
+		if xrayCfg.Routing.DomainStrategy != "AsIs" {
+			t.Errorf("domainStrategy = %q, want AsIs", xrayCfg.Routing.DomainStrategy)
+		}
+		// Should have exactly 1 routing rule: geoip:private
+		if len(xrayCfg.Routing.Rules) != 1 {
+			t.Fatalf("rule count = %d, want 1", len(xrayCfg.Routing.Rules))
+		}
+		if xrayCfg.Routing.Rules[0].IP[0] != "geoip:private" {
+			t.Error("expected geoip:private rule")
+		}
+	})
+
+	t.Run("exclusive mode with domain rule", func(t *testing.T) {
+		splitCfg := &splittunnel.Config{
+			Enabled: true,
+			Mode:    splittunnel.ModeExclusive,
+			Rules: []splittunnel.Rule{
+				{Value: "example.org", Type: splittunnel.RuleTypeDomain},
+			},
+		}
+
+		xrayCfg, _, err := BuildConfig(baseSrv, 1080, 8080, splitCfg)
+		if err != nil {
+			t.Fatalf("BuildConfig error: %v", err)
+		}
+
+		// Outbound order: proxy first, direct second (exclusive mode)
+		if xrayCfg.Outbounds[0].Tag != "proxy" {
+			t.Errorf("first outbound tag = %q, want proxy", xrayCfg.Outbounds[0].Tag)
+		}
+		if xrayCfg.Outbounds[1].Tag != "direct" {
+			t.Errorf("second outbound tag = %q, want direct", xrayCfg.Outbounds[1].Tag)
+		}
+
+		// Domain strategy should be IPIfNonMatch (has domain rules)
+		if xrayCfg.Routing.DomainStrategy != "IPIfNonMatch" {
+			t.Errorf("domainStrategy = %q, want IPIfNonMatch", xrayCfg.Routing.DomainStrategy)
+		}
+
+		// User rule should be before geoip:private
+		if len(xrayCfg.Routing.Rules) < 2 {
+			t.Fatalf("expected at least 2 routing rules, got %d", len(xrayCfg.Routing.Rules))
+		}
+		// First rule: user domain rule with outboundTag "direct"
+		userRule := xrayCfg.Routing.Rules[0]
+		if userRule.OutboundTag != "direct" {
+			t.Errorf("user rule outboundTag = %q, want direct", userRule.OutboundTag)
+		}
+		if len(userRule.Domain) == 0 {
+			t.Error("user rule should have domain entries")
+		}
+		// Last rule: geoip:private
+		lastRule := xrayCfg.Routing.Rules[len(xrayCfg.Routing.Rules)-1]
+		if len(lastRule.IP) == 0 || lastRule.IP[0] != "geoip:private" {
+			t.Error("last routing rule should be geoip:private")
+		}
+	})
+
+	t.Run("inclusive mode with IP rule", func(t *testing.T) {
+		splitCfg := &splittunnel.Config{
+			Enabled: true,
+			Mode:    splittunnel.ModeInclusive,
+			Rules: []splittunnel.Rule{
+				{Value: "10.0.0.0/8", Type: splittunnel.RuleTypeCIDR},
+			},
+		}
+
+		xrayCfg, _, err := BuildConfig(baseSrv, 1080, 8080, splitCfg)
+		if err != nil {
+			t.Fatalf("BuildConfig error: %v", err)
+		}
+
+		// Inclusive mode: direct first, proxy second
+		if xrayCfg.Outbounds[0].Tag != "direct" {
+			t.Errorf("first outbound tag = %q, want direct (inclusive mode)", xrayCfg.Outbounds[0].Tag)
+		}
+		if xrayCfg.Outbounds[0].Protocol != "freedom" {
+			t.Errorf("first outbound protocol = %q, want freedom", xrayCfg.Outbounds[0].Protocol)
+		}
+
+		// Domain strategy should be AsIs (IP-only rules)
+		if xrayCfg.Routing.DomainStrategy != "AsIs" {
+			t.Errorf("domainStrategy = %q, want AsIs (IP-only rules)", xrayCfg.Routing.DomainStrategy)
+		}
+
+		// User rule should have outboundTag "proxy"
+		userRule := xrayCfg.Routing.Rules[0]
+		if userRule.OutboundTag != "proxy" {
+			t.Errorf("user rule outboundTag = %q, want proxy", userRule.OutboundTag)
+		}
+	})
 }
