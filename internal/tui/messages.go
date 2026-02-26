@@ -50,6 +50,12 @@ type connectResultMsg struct {
 // disconnectMsg requests disconnection from the current server.
 type disconnectMsg struct{}
 
+// autoConnectMsg carries the result of the auto-connect attempt on TUI startup.
+type autoConnectMsg struct {
+	ServerID string // ID of the server auto-connected to (empty if skipped)
+	Err      error  // nil on success, non-nil on failure, nil+empty ID means skipped
+}
+
 // tickMsg is sent on each uptime tick interval.
 type tickMsg time.Time
 
