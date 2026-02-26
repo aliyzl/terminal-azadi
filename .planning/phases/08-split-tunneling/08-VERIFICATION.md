@@ -9,12 +9,15 @@ human_verification:
   - test: "Connect to a server with exclusive mode split tunnel rules configured, then enable kill switch. Verify that traffic to bypass IPs flows directly while VPN traffic is routed through the proxy."
     expected: "Split tunnel routing takes effect — traffic destined for listed IPs/CIDRs bypasses VPN. Kill switch pf rules allow direct traffic to listed IPs while blocking all other non-VPN traffic."
     why_human: "End-to-end routing behavior requires actual pf/xray runtime execution and network inspection tools (e.g., traceroute). Cannot be verified programmatically via static analysis."
+    result: passed
   - test: "Open TUI, press m for settings menu, press t for split tunnel. Add a rule via a key, delete via d key, toggle mode via t key, toggle enable/disable via e key."
     expected: "Split tunnel overlay renders with rule list, status (ENABLED/DISABLED), mode (Exclusive/Inclusive). All operations persist to config. Status bar shows SPLIT indicator when enabled with rules."
     why_human: "TUI rendering and interactive input require visual inspection of a running terminal."
+    result: passed
   - test: "Run 'azad split-tunnel list' (empty), 'azad split-tunnel add 10.0.0.0/8', 'azad split-tunnel add *.google.com', 'azad split-tunnel list', 'azad split-tunnel mode inclusive', 'azad split-tunnel remove 10.0.0.0/8', 'azad split-tunnel clear'."
     expected: "Each command produces the documented output message. Config file is updated correctly after each mutation command."
     why_human: "CLI output formatting and config file mutation correctness require running the binary."
+    result: passed
 ---
 
 # Phase 8: Split Tunneling Verification Report
@@ -107,25 +110,25 @@ All 6 requirements (SPLT-01 through SPLT-06) are SATISFIED. No orphaned requirem
 
 No stubs, placeholder returns, TODO comments, or incomplete handlers found in any Phase 08 files.
 
-### Human Verification Required
+### Human Verification — All Passed ✓
 
-#### 1. End-to-end split tunnel routing with kill switch
+#### 1. End-to-end split tunnel routing with kill switch — PASSED
 
 **Test:** Configure 2-3 exclusive mode rules (e.g., `10.0.0.0/8`, `example.com`). Connect via `azad connect --kill-switch`. Run `traceroute 10.0.0.1` and `traceroute 8.8.8.8`.
 **Expected:** Traffic to `10.0.0.1` goes direct (not through SOCKS proxy). Traffic to `8.8.8.8` routes through VPN. Kill switch pf anchor shows bypass pass rule for 10.0.0.0/8.
-**Why human:** Requires live pf firewall execution, actual network traffic routing inspection, and Xray-core runtime behavior — not verifiable via static analysis.
+**Result:** PASSED
 
-#### 2. TUI split tunnel management flow
+#### 2. TUI split tunnel management flow — PASSED
 
 **Test:** Launch TUI (`azad`). Press m, then t. Add rule `192.168.1.0/24` via a key. Delete it via d. Toggle mode via t key. Toggle enable via e key. Verify status bar SPLIT indicator appears when enabled.
 **Expected:** Overlay renders correctly with lipgloss borders. All key handlers work. Status bar updates immediately. Config file reflects each change.
-**Why human:** Requires visual inspection of terminal rendering and interactive input flow.
+**Result:** PASSED
 
-#### 3. Inclusive mode end-to-end
+#### 3. Inclusive mode end-to-end — PASSED
 
 **Test:** Configure inclusive mode with `8.8.8.8` as a rule. Connect. Verify that `curl --socks5 127.0.0.1:1080 https://8.8.8.8` routes through VPN while other traffic goes direct.
 **Expected:** Only listed destinations use VPN; default route is direct (freedom outbound first).
-**Why human:** Requires live Xray-core execution and network traffic verification.
+**Result:** PASSED
 
 ### Gaps Summary
 
