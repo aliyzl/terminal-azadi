@@ -128,7 +128,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 07-01-PLAN.md — killswitch package (pf rules, privilege escalation, enable/disable API) + ProxyState extension + cleanup upgrade
+- [x] 07-01-PLAN.md — killswitch package (pf rules, privilege escalation, enable/disable API) + ProxyState extension + cleanup upgrade
 - [ ] 07-02-PLAN.md — Wire kill switch into CLI (--kill-switch flag), TUI (K keybinding toggle), startup recovery, status bar
 
 ## Progress
@@ -144,4 +144,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 4. TUI and Server Interaction | 4/4 | Complete | 2026-02-26 |
 | 5. Quick Connect | 2/2 | Complete    | 2026-02-26 |
 | 6. Distribution | 0/? | Not started | - |
-| 7. Kill Switch | 0/? | Not started | - |
+| 7. Kill Switch | 1/2 | In progress | - |
