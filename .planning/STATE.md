@@ -9,17 +9,17 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 
 ## Current Position
 
-Phase: 6 of 8 (Distribution)
-Plan: 3 of 4 in current phase
-Status: In progress
-Last activity: 2026-02-26 -- Completed 06-03 Install script and Homebrew tap
+Phase: 6 of 8 (Distribution) -- COMPLETE
+Plan: 4 of 4 in current phase
+Status: Phase complete
+Last activity: 2026-02-26 -- Completed 06-04 Linux packages (nFPM, AUR, snap)
 
-Progress: [█████████░] 90% (7/8 phases complete)
+Progress: [██████████] 100% (8/8 phases complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 21
+- Total plans completed: 22
 - Average duration: 6min
 - Total execution time: 1.8 hours
 
@@ -34,10 +34,10 @@ Progress: [█████████░] 90% (7/8 phases complete)
 | 5. Quick Connect | 2 | 5min | 3min |
 | 7. Kill Switch | 2 | 7min | 4min |
 | 8. Split Tunneling | 3 | 20min | 7min |
-| 6. Distribution | 3 | 7min | 2min |
+| 6. Distribution | 4 | 8min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 6min, 7min, 2min, 3min, 2min
+- Last 5 plans: 7min, 2min, 3min, 2min, 1min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -119,6 +119,9 @@ Recent decisions affecting current work:
 - POSIX sh (not bash) for install script maximum portability across macOS and Linux (06-03)
 - Fallback from /usr/local/bin to ~/.local/bin when no sudo available (06-03)
 - Conditional skip_upload in brews for snapshot builds only (06-03)
+- ConventionalFileName template for standard .deb/.rpm naming (06-04)
+- azad-bin AUR name follows binary package convention (06-04)
+- Classic snap confinement for VPN network control capabilities (06-04)
 
 ### Pending Todos
 
@@ -133,5 +136,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 06-03-PLAN.md (Install script and Homebrew tap)
-Resume file: .planning/phases/06-distribution/06-03-SUMMARY.md
+Stopped at: Completed 06-04-PLAN.md (Linux packages - nFPM, AUR, snap)
+Resume file: .planning/phases/06-distribution/06-04-SUMMARY.md
