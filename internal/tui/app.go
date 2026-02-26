@@ -198,13 +198,25 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return m, nil
 
+	case tea.PasteMsg:
+		if m.view == viewAddServer || m.view == viewAddSubscription {
+			var cmd tea.Cmd
+			m.input, cmd = m.input.Update(msg)
+			return m, cmd
+		}
+		return m, nil
+
 	case tea.KeyPressMsg:
 		return m.handleKeyPress(msg)
 	}
 
-	// Pass other messages to the server list
+	// Pass other messages to the active child model based on view state
 	var cmd tea.Cmd
-	m.serverList, cmd = m.serverList.Update(msg)
+	if m.view == viewAddServer || m.view == viewAddSubscription {
+		m.input, cmd = m.input.Update(msg)
+	} else {
+		m.serverList, cmd = m.serverList.Update(msg)
+	}
 	if cmd != nil {
 		cmds = append(cmds, cmd)
 	}
