@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Connection Engine** - Xray-core proxy lifecycle, system proxy, connection verification
 - [x] **Phase 4: TUI and Server Interaction** - Full interactive terminal UI with server list, ping, navigation, and server management
 - [x] **Phase 5: Quick Connect** - Zero-argument TUI launch, headless connect, session memory
-- [ ] **Phase 6: Distribution** - Cross-platform builds, installer script, Homebrew tap, Linux packages, geo asset auto-download
+- [x] **Phase 6: Distribution** - Cross-platform builds, installer script, Homebrew tap, Linux packages, geo asset auto-download (completed 2026-02-26)
 - [x] **Phase 7: Kill Switch** - Firewall-based traffic blocking, terminal close guard, crash-safe recovery (completed 2026-02-26)
 - [x] **Phase 8: Split Tunneling** - Route-based traffic splitting with inclusive/exclusive modes, IP and hostname rules (completed 2026-02-26)
 
@@ -169,6 +169,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 3. Connection Engine | 3/3 | Complete    | 2026-02-25 |
 | 4. TUI and Server Interaction | 4/4 | Complete | 2026-02-26 |
 | 5. Quick Connect | 2/2 | Complete    | 2026-02-26 |
-| 6. Distribution | 0/4 | Not started | - |
+| 6. Distribution | 0/4 | Complete    | 2026-02-26 |
 | 7. Kill Switch | 2/2 | Complete    | 2026-02-26 |
 | 8. Split Tunneling | 3/3 | Complete    | 2026-02-26 |
