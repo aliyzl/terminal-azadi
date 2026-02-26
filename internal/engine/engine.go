@@ -8,6 +8,7 @@ import (
 
 	"github.com/leejooy96/azad/internal/config"
 	"github.com/leejooy96/azad/internal/protocol"
+	"github.com/leejooy96/azad/internal/splittunnel"
 	"github.com/xtls/xray-core/core"
 )
 
@@ -52,7 +53,8 @@ type Engine struct {
 
 // Start creates and starts an Xray-core proxy instance for the given server.
 // The engine transitions: Disconnected -> Connecting -> Connected (or Error).
-func (e *Engine) Start(ctx context.Context, srv protocol.Server, socksPort, httpPort int) error {
+// splitCfg is an optional variadic parameter for split tunnel configuration.
+func (e *Engine) Start(ctx context.Context, srv protocol.Server, socksPort, httpPort int, splitCfg ...*splittunnel.Config) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -69,8 +71,14 @@ func (e *Engine) Start(ctx context.Context, srv protocol.Server, socksPort, http
 		os.Setenv("XRAY_LOCATION_ASSET", dataDir)
 	}
 
+	// Extract split tunnel config if provided.
+	var sc *splittunnel.Config
+	if len(splitCfg) > 0 {
+		sc = splitCfg[0]
+	}
+
 	// Build the Xray JSON config and load it into a core.Config.
-	_, coreConfig, err := BuildConfig(srv, socksPort, httpPort, nil)
+	_, coreConfig, err := BuildConfig(srv, socksPort, httpPort, sc)
 	if err != nil {
 		e.status = StatusError
 		e.err = fmt.Errorf("building config: %w", err)

@@ -12,8 +12,14 @@ const anchorName = "com.azad.killswitch"
 // Enable loads kill switch pf rules into the kernel via a named anchor.
 // It generates rules allowing only VPN server traffic, then loads them
 // with pfctl and enables pf.
-func Enable(serverIP string, serverPort int) error {
-	rules := GenerateRules(serverIP, serverPort)
+// bypassIPs is an optional variadic parameter: if provided, those IPs/CIDRs
+// will be allowed direct traffic through the firewall (split tunnel coordination).
+func Enable(serverIP string, serverPort int, bypassIPs ...[]string) error {
+	var bypass []string
+	if len(bypassIPs) > 0 {
+		bypass = bypassIPs[0]
+	}
+	rules := GenerateRules(serverIP, serverPort, bypass)
 	encoded := base64.StdEncoding.EncodeToString([]byte(rules))
 
 	command := fmt.Sprintf(
