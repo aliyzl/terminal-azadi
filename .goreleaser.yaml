@@ -52,3 +52,19 @@ release:
     owner: leejooy96
     name: azad
   name_template: "Azad v{{.Version}}"
+
+brews:
+  - repository:
+      owner: leejooy96
+      name: homebrew-tap
+    directory: Formula
+    homepage: https://github.com/leejooy96/azad
+    description: "Beautiful terminal VPN client — one command to connect to the fastest server"
+    license: MIT
+    skip_upload: "{{ if .IsSnapshot }}true{{ end }}"
+    test: |
+      system "#{bin}/azad", "--version"
+    extra_install: |-
+      bash_completion.install "completions/azad.bash" => "azad"
+      zsh_completion.install "completions/azad.zsh" => "_azad"
+      fish_completion.install "completions/azad.fish"
