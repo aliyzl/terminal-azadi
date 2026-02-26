@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"net"
 	"os"
 	"path/filepath"
 	"strings"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/leejooy96/azad/internal/config"
 	"github.com/leejooy96/azad/internal/engine"
+	"github.com/leejooy96/azad/internal/killswitch"
 	"github.com/leejooy96/azad/internal/lifecycle"
 	"github.com/leejooy96/azad/internal/protocol"
 	"github.com/leejooy96/azad/internal/serverstore"
@@ -17,14 +19,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var killSwitchFlag bool
+
 func newConnectCmd() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "connect [server-name]",
 		Short: "Connect to a VPN server",
 		Long:  "Connect to a VPN server using Xray-core proxy. Optionally specify a server name or ID.",
 		Args:  cobra.MaximumNArgs(1),
 		RunE:  runConnect,
 	}
+	cmd.Flags().BoolVar(&killSwitchFlag, "kill-switch", false, "Enable kill switch to block all non-VPN traffic")
+	return cmd
 }
 
 func runConnect(cmd *cobra.Command, args []string) error {
@@ -70,9 +76,17 @@ func runConnect(cmd *cobra.Command, args []string) error {
 	// Detect network service for system proxy.
 	svc, svcErr := sysproxy.DetectNetworkService()
 
+	// Resolve server IP for kill switch (DNS resolution before enabling).
+	resolvedIP := server.Address
+	if killSwitchFlag {
+		if ips, err := net.LookupHost(server.Address); err == nil && len(ips) > 0 {
+			resolvedIP = ips[0]
+		}
+	}
+
 	// Write ProxyState BEFORE setting proxy for crash safety.
 	if svcErr == nil {
-		writeProxyState(svc, cfg.Proxy.SOCKSPort, cfg.Proxy.HTTPPort)
+		writeProxyState(svc, cfg.Proxy.SOCKSPort, cfg.Proxy.HTTPPort, killSwitchFlag, resolvedIP, server.Port)
 	}
 
 	// Set system proxy.
@@ -83,6 +97,15 @@ func runConnect(cmd *cobra.Command, args []string) error {
 		fmt.Printf("Warning: could not set system proxy: %v\n", err)
 	} else {
 		proxySetOK = true
+	}
+
+	// Enable kill switch if requested.
+	if killSwitchFlag {
+		if err := killswitch.Enable(resolvedIP, server.Port); err != nil {
+			fmt.Printf("Warning: could not enable kill switch: %v\n", err)
+		} else {
+			fmt.Println("Kill switch enabled -- all non-VPN traffic blocked.")
+		}
 	}
 
 	// Fetch direct IP (best-effort).
@@ -122,6 +145,15 @@ func runConnect(cmd *cobra.Command, args []string) error {
 	<-ctx.Done()
 
 	fmt.Println("Disconnecting...")
+
+	// Disable kill switch before stopping engine/proxy.
+	if killSwitchFlag {
+		if err := killswitch.Disable(); err != nil {
+			fmt.Printf("Warning: could not disable kill switch: %v\n", err)
+		} else {
+			fmt.Println("Kill switch disabled.")
+		}
+	}
 
 	// Stop the engine.
 	if err := eng.Stop(); err != nil {
@@ -196,18 +228,21 @@ func findServer(store *serverstore.Store, cfg *config.Config, args []string) (*p
 }
 
 // writeProxyState writes the proxy state file for crash recovery.
-func writeProxyState(service string, socksPort, httpPort int) {
+func writeProxyState(service string, socksPort, httpPort int, ksActive bool, serverAddr string, serverPort int) {
 	statePath, err := config.StateFilePath()
 	if err != nil {
 		return
 	}
 
 	state := lifecycle.ProxyState{
-		ProxySet:       true,
-		SOCKSPort:      socksPort,
-		HTTPPort:       httpPort,
-		NetworkService: service,
-		PID:            os.Getpid(),
+		ProxySet:         true,
+		SOCKSPort:        socksPort,
+		HTTPPort:         httpPort,
+		NetworkService:   service,
+		PID:              os.Getpid(),
+		KillSwitchActive: ksActive,
+		ServerAddress:    serverAddr,
+		ServerPort:       serverPort,
 	}
 
 	data, err := json.Marshal(state)

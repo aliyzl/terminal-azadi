@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -26,6 +27,19 @@ func NewRootCmd(version string) *cobra.Command {
 		Short: "Beautiful terminal VPN client",
 		Long:  "Azad — One command to connect to the fastest VPN server through a stunning terminal interface",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			// Kill switch recovery detection: inform user if kill switch is active from a previous session.
+			if !cleanup {
+				if statePath, err := config.StateFilePath(); err == nil {
+					if data, err := os.ReadFile(statePath); err == nil {
+						var state lifecycle.ProxyState
+						if err := json.Unmarshal(data, &state); err == nil && state.KillSwitchActive {
+							fmt.Println("Kill switch is active from a previous session. Internet is blocked.")
+							fmt.Println("Reconnecting to restore internet through VPN...")
+						}
+					}
+				}
+			}
+
 			if cleanup {
 				configDir, err := config.Dir()
 				if err != nil {
