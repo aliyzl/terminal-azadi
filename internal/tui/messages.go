@@ -59,6 +59,12 @@ type autoConnectMsg struct {
 // tickMsg is sent on each uptime tick interval.
 type tickMsg time.Time
 
+// killSwitchResultMsg carries the result of a kill switch enable/disable operation.
+type killSwitchResultMsg struct {
+	Enabled bool
+	Err     error
+}
+
 // errMsg carries a generic error.
 type errMsg struct {
 	Err error

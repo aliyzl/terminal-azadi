@@ -15,6 +15,7 @@ type statusBarModel struct {
 	connectedAt time.Time
 	width       int
 	styles      Styles
+	killSwitch  bool
 }
 
 // Update refreshes the displayed connection state.
@@ -32,6 +33,11 @@ func (m *statusBarModel) SetConnectedAt(t time.Time) {
 // SetSize updates the status bar width.
 func (m *statusBarModel) SetSize(w int) {
 	m.width = w
+}
+
+// SetKillSwitch sets the kill switch indicator state.
+func (m *statusBarModel) SetKillSwitch(active bool) {
+	m.killSwitch = active
 }
 
 // SetStyles updates the styles used for rendering.
@@ -73,8 +79,17 @@ func (m statusBarModel) View() string {
 		uptimeDisplay = fmt.Sprintf("%dh %dm %ds", hours, minutes, seconds)
 	}
 
+	// Kill switch indicator
+	var killSwitchDisplay string
+	if m.killSwitch {
+		killSwitchDisplay = m.styles.Warning.Bold(true).Render("KILL SW: ON")
+	}
+
 	// Compose sections
 	sections := statusIndicator + "  " + serverDisplay + "  " + portDisplay
+	if killSwitchDisplay != "" {
+		sections += "  " + killSwitchDisplay
+	}
 	if uptimeDisplay != "" {
 		sections += "  " + uptimeDisplay
 	}

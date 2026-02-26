@@ -3,12 +3,15 @@ package tui
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"net"
 	"os"
 	"time"
 
 	tea "charm.land/bubbletea/v2"
 	"github.com/leejooy96/azad/internal/config"
 	"github.com/leejooy96/azad/internal/engine"
+	"github.com/leejooy96/azad/internal/killswitch"
 	"github.com/leejooy96/azad/internal/lifecycle"
 	"github.com/leejooy96/azad/internal/protocol"
 	"github.com/leejooy96/azad/internal/serverstore"
@@ -56,9 +59,16 @@ func connectServerCmd(srv protocol.Server, eng *engine.Engine, cfg *config.Confi
 }
 
 // disconnectCmd returns a tea.Cmd that stops the engine, unsets the system
-// proxy, and removes the proxy state file.
-func disconnectCmd(eng *engine.Engine) tea.Cmd {
+// proxy, and removes the proxy state file. If ksActive is true, it disables
+// the kill switch before stopping.
+func disconnectCmd(eng *engine.Engine, ksActive ...bool) tea.Cmd {
+	disableKS := len(ksActive) > 0 && ksActive[0]
 	return func() tea.Msg {
+		// Disable kill switch before stopping engine.
+		if disableKS {
+			_ = killswitch.Disable()
+		}
+
 		// Detect network service.
 		svc, svcErr := sysproxy.DetectNetworkService()
 
@@ -149,6 +159,80 @@ func resolveBestServer(servers []protocol.Server, cfg *config.Config, store *ser
 
 	// Fall back to first server.
 	return &servers[0]
+}
+
+// enableKillSwitchCmd returns a tea.Cmd that enables the kill switch.
+// It resolves the connected server IP and calls killswitch.Enable.
+func enableKillSwitchCmd(eng *engine.Engine, cfg *config.Config) tea.Cmd {
+	return func() tea.Msg {
+		_, srv, _ := eng.Status()
+		if srv == nil {
+			return killSwitchResultMsg{Err: fmt.Errorf("not connected")}
+		}
+
+		// Resolve server address to IP.
+		resolvedIP := srv.Address
+		if ips, err := net.LookupHost(srv.Address); err == nil && len(ips) > 0 {
+			resolvedIP = ips[0]
+		}
+
+		if err := killswitch.Enable(resolvedIP, srv.Port); err != nil {
+			return killSwitchResultMsg{Err: err}
+		}
+
+		// Update proxy state with kill switch fields.
+		tuiWriteProxyStateWithKS(cfg.Proxy.SOCKSPort, cfg.Proxy.HTTPPort, true, resolvedIP, srv.Port)
+
+		return killSwitchResultMsg{Enabled: true}
+	}
+}
+
+// disableKillSwitchCmd returns a tea.Cmd that disables the kill switch.
+func disableKillSwitchCmd() tea.Cmd {
+	return func() tea.Msg {
+		if err := killswitch.Disable(); err != nil {
+			return killSwitchResultMsg{Err: err}
+		}
+
+		// Update proxy state to clear kill switch fields.
+		tuiWriteProxyStateWithKS(0, 0, false, "", 0)
+
+		return killSwitchResultMsg{Enabled: false}
+	}
+}
+
+// tuiWriteProxyStateWithKS writes the proxy state with kill switch fields.
+func tuiWriteProxyStateWithKS(socksPort, httpPort int, ksActive bool, serverAddr string, serverPort int) {
+	statePath, err := config.StateFilePath()
+	if err != nil {
+		return
+	}
+
+	// Read existing state to preserve non-kill-switch fields.
+	var state lifecycle.ProxyState
+	if data, err := os.ReadFile(statePath); err == nil {
+		_ = json.Unmarshal(data, &state)
+	}
+
+	// Update kill switch fields.
+	state.KillSwitchActive = ksActive
+	state.ServerAddress = serverAddr
+	state.ServerPort = serverPort
+
+	// Update proxy fields if provided (non-zero).
+	if socksPort > 0 {
+		state.SOCKSPort = socksPort
+	}
+	if httpPort > 0 {
+		state.HTTPPort = httpPort
+	}
+
+	data, err := json.Marshal(state)
+	if err != nil {
+		return
+	}
+
+	_ = os.WriteFile(statePath, data, 0600)
 }
 
 // tuiWriteProxyState writes the proxy state file for crash recovery.

@@ -10,6 +10,7 @@ import (
 	"charm.land/lipgloss/v2"
 	"github.com/leejooy96/azad/internal/config"
 	"github.com/leejooy96/azad/internal/engine"
+	"github.com/leejooy96/azad/internal/killswitch"
 	"github.com/leejooy96/azad/internal/serverstore"
 )
 
@@ -22,6 +23,7 @@ const (
 	viewAddServer
 	viewAddSubscription
 	viewConfirmDelete
+	viewConfirmKillSwitch
 )
 
 // Minimum terminal dimensions for usable layout.
@@ -41,15 +43,16 @@ type model struct {
 	keys       keyMap
 
 	// State
-	view          viewState
-	width         int
-	height        int
-	ready         bool
-	pinging       bool
-	pingTotal     int
-	pingDone      int
-	pingLatencies map[string]int // serverID -> latencyMs (-1 = error)
-	confirmDelete bool
+	view             viewState
+	width            int
+	height           int
+	ready            bool
+	pinging          bool
+	pingTotal        int
+	pingDone         int
+	pingLatencies    map[string]int // serverID -> latencyMs (-1 = error)
+	confirmDelete    bool
+	killSwitchActive bool
 
 	// Shared references
 	store  *serverstore.Store
@@ -77,18 +80,25 @@ func New(store *serverstore.Store, eng *engine.Engine, cfg *config.Config) model
 		detail.SetServer(srv)
 	}
 
+	// Check if kill switch is active from a previous session (recovery).
+	ksActive := killswitch.IsActive()
+	if ksActive {
+		sb.SetKillSwitch(true)
+	}
+
 	return model{
-		serverList:    serverList,
-		detail:        detail,
-		statusBar:     sb,
-		help:          help,
-		input:         newInputModel(),
-		keys:          keys,
-		view:          viewNormal,
-		pingLatencies: make(map[string]int),
-		store:         store,
-		engine:        eng,
-		cfg:           cfg,
+		serverList:       serverList,
+		detail:           detail,
+		statusBar:        sb,
+		help:             help,
+		input:            newInputModel(),
+		keys:             keys,
+		view:             viewNormal,
+		pingLatencies:    make(map[string]int),
+		killSwitchActive: ksActive,
+		store:            store,
+		engine:           eng,
+		cfg:              cfg,
 	}
 }
 
@@ -206,6 +216,18 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case disconnectMsg:
 		m.statusBar.Update(engine.StatusDisconnected, "", m.cfg.Proxy.SOCKSPort)
 		m.statusBar.SetConnectedAt(time.Time{})
+		m.killSwitchActive = false
+		m.statusBar.SetKillSwitch(false)
+		return m, nil
+
+	case killSwitchResultMsg:
+		if msg.Err != nil {
+			// Flash error via input modal pattern.
+			m.input.err = msg.Err
+			return m, nil
+		}
+		m.killSwitchActive = msg.Enabled
+		m.statusBar.SetKillSwitch(msg.Enabled)
 		return m, nil
 
 	case errMsg:
@@ -299,6 +321,17 @@ func (m model) handleKeyPress(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		}
 		return m, nil
 
+	case viewConfirmKillSwitch:
+		switch key {
+		case "y", "enter":
+			m.view = viewNormal
+			return m, enableKillSwitchCmd(m.engine, m.cfg)
+		case "n", "esc":
+			m.view = viewNormal
+			return m, nil
+		}
+		return m, nil
+
 	case viewNormal:
 		// If the list is actively filtering, let it handle most keys
 		if m.serverList.FilterState() == list.Filtering {
@@ -312,7 +345,10 @@ func (m model) handleKeyPress(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		case "q", "ctrl+c":
 			status, _, _ := m.engine.Status()
 			if status == engine.StatusConnected || status == engine.StatusConnecting {
-				return m, tea.Sequence(disconnectCmd(m.engine), tea.Quit)
+				return m, tea.Sequence(disconnectCmd(m.engine, m.killSwitchActive), tea.Quit)
+			}
+			if m.killSwitchActive {
+				return m, tea.Sequence(disableKillSwitchCmd(), tea.Quit)
 			}
 			return m, tea.Quit
 
@@ -341,6 +377,15 @@ func (m model) handleKeyPress(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 
 		case "D":
 			m.view = viewConfirmDelete
+			return m, nil
+
+		case "K":
+			if m.killSwitchActive {
+				// Disable directly without confirmation.
+				return m, disableKillSwitchCmd()
+			}
+			// Show confirmation overlay before enabling.
+			m.view = viewConfirmKillSwitch
 			return m, nil
 
 		case "p":
@@ -530,6 +575,15 @@ func (m model) View() tea.View {
 			Padding(1, 2).
 			Width(40).
 			Render("Clear all servers?\n\n(y) Yes  (n) No")
+		content = lipgloss.Place(m.width, m.height, lipgloss.Center, lipgloss.Center, confirmBox)
+
+	case viewConfirmKillSwitch:
+		confirmBox := lipgloss.NewStyle().
+			Border(lipgloss.RoundedBorder()).
+			BorderForeground(DefaultTheme.Warning.Dark).
+			Padding(1, 2).
+			Width(44).
+			Render("Enable kill switch?\n\nThis blocks ALL non-VPN traffic.\nRequires admin password.\n\n(y) Yes  (n) No")
 		content = lipgloss.Place(m.width, m.height, lipgloss.Center, lipgloss.Center, confirmBox)
 	}
 
