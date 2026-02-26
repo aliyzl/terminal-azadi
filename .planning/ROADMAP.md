@@ -18,6 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: TUI and Server Interaction** - Full interactive terminal UI with server list, ping, navigation, and server management
 - [x] **Phase 5: Quick Connect** - Zero-argument TUI launch, headless connect, session memory
 - [ ] **Phase 6: Distribution** - Cross-platform builds, geo asset management, recovery commands
+- [ ] **Phase 7: Kill Switch** - Firewall-based traffic blocking, terminal close guard, crash-safe recovery
 
 ## Phase Details
 
@@ -114,10 +115,25 @@ Plans:
 Plans:
 - [ ] 06-01: TBD
 
+### Phase 7: Kill Switch
+**Goal**: When enabled, all non-VPN traffic is blocked at the firewall level — if VPN drops or terminal closes, nothing leaks. User can always recover via `azad` or `azad --cleanup`.
+**Depends on**: Phase 6
+**Requirements**: KILL-01, KILL-02, KILL-03, KILL-04, KILL-05
+**Success Criteria** (what must be TRUE):
+  1. With kill switch enabled, closing the terminal or crashing the app blocks ALL internet traffic (no leak)
+  2. Running `azad` after a crash/close resumes the VPN session (or offers to reconnect), restoring internet through the VPN
+  3. Running `azad --cleanup` disables the kill switch firewall rules and restores normal internet, even if VPN state is broken
+  4. macOS shows a confirmation dialog when user tries to close the terminal window while kill switch is active
+  5. Kill switch is a manual toggle (TUI keybinding or `azad connect --kill-switch`), not automatic
+**Plans**: TBD
+
+Plans:
+- [ ] 07-01: TBD
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -127,3 +143,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 4. TUI and Server Interaction | 4/4 | Complete | 2026-02-26 |
 | 5. Quick Connect | 2/2 | Complete    | 2026-02-26 |
 | 6. Distribution | 0/? | Not started | - |
+| 7. Kill Switch | 0/? | Not started | - |
