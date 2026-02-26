@@ -70,7 +70,7 @@ func (e *Engine) Start(ctx context.Context, srv protocol.Server, socksPort, http
 	}
 
 	// Build the Xray JSON config and load it into a core.Config.
-	_, coreConfig, err := BuildConfig(srv, socksPort, httpPort)
+	_, coreConfig, err := BuildConfig(srv, socksPort, httpPort, nil)
 	if err != nil {
 		e.status = StatusError
 		e.err = fmt.Errorf("building config: %w", err)

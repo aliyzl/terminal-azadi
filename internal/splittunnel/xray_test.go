@@ -2,8 +2,6 @@ package splittunnel
 
 import (
 	"testing"
-
-	"github.com/leejooy96/azad/internal/engine"
 )
 
 func TestToXrayRules(t *testing.T) {
@@ -12,7 +10,7 @@ func TestToXrayRules(t *testing.T) {
 		rules     []Rule
 		mode      Mode
 		wantCount int
-		check     func(t *testing.T, result []engine.RoutingRule)
+		check     func(t *testing.T, result []XrayRoutingRule)
 	}{
 		{
 			name: "exclusive mode domain rule",
@@ -21,7 +19,7 @@ func TestToXrayRules(t *testing.T) {
 			},
 			mode:      ModeExclusive,
 			wantCount: 1,
-			check: func(t *testing.T, result []engine.RoutingRule) {
+			check: func(t *testing.T, result []XrayRoutingRule) {
 				r := result[0]
 				if r.OutboundTag != "direct" {
 					t.Errorf("outboundTag = %q, want direct", r.OutboundTag)
@@ -58,7 +56,7 @@ func TestToXrayRules(t *testing.T) {
 			},
 			mode:      ModeExclusive,
 			wantCount: 1,
-			check: func(t *testing.T, result []engine.RoutingRule) {
+			check: func(t *testing.T, result []XrayRoutingRule) {
 				r := result[0]
 				if r.OutboundTag != "direct" {
 					t.Errorf("outboundTag = %q, want direct", r.OutboundTag)
@@ -75,7 +73,7 @@ func TestToXrayRules(t *testing.T) {
 			},
 			mode:      ModeExclusive,
 			wantCount: 1,
-			check: func(t *testing.T, result []engine.RoutingRule) {
+			check: func(t *testing.T, result []XrayRoutingRule) {
 				r := result[0]
 				if r.OutboundTag != "direct" {
 					t.Errorf("outboundTag = %q, want direct", r.OutboundTag)
@@ -92,7 +90,7 @@ func TestToXrayRules(t *testing.T) {
 			},
 			mode:      ModeInclusive,
 			wantCount: 1,
-			check: func(t *testing.T, result []engine.RoutingRule) {
+			check: func(t *testing.T, result []XrayRoutingRule) {
 				r := result[0]
 				if r.OutboundTag != "proxy" {
 					t.Errorf("outboundTag = %q, want proxy", r.OutboundTag)
@@ -108,7 +106,7 @@ func TestToXrayRules(t *testing.T) {
 			},
 			mode:      ModeExclusive,
 			wantCount: 2,
-			check: func(t *testing.T, result []engine.RoutingRule) {
+			check: func(t *testing.T, result []XrayRoutingRule) {
 				// First rule should be domains
 				domainRule := result[0]
 				if len(domainRule.Domain) == 0 {
@@ -136,7 +134,7 @@ func TestToXrayRules(t *testing.T) {
 			rules:     nil,
 			mode:      ModeExclusive,
 			wantCount: 0,
-			check: func(t *testing.T, result []engine.RoutingRule) {
+			check: func(t *testing.T, result []XrayRoutingRule) {
 				if len(result) != 0 {
 					t.Errorf("expected empty result, got %d rules", len(result))
 				}

@@ -13,8 +13,9 @@ import (
 
 // Config is the top-level application configuration.
 type Config struct {
-	Proxy  ProxyConfig  `koanf:"proxy"`
-	Server ServerConfig `koanf:"server"`
+	Proxy       ProxyConfig       `koanf:"proxy"`
+	Server      ServerConfig      `koanf:"server"`
+	SplitTunnel SplitTunnelConfig `koanf:"split_tunnel"`
 }
 
 // ProxyConfig holds proxy port settings.
@@ -26,6 +27,19 @@ type ProxyConfig struct {
 // ServerConfig holds server-related settings.
 type ServerConfig struct {
 	LastUsed string `koanf:"last_used"`
+}
+
+// SplitTunnelConfig holds split tunneling settings.
+type SplitTunnelConfig struct {
+	Enabled bool              `koanf:"enabled"`
+	Mode    string            `koanf:"mode"`
+	Rules   []SplitTunnelRule `koanf:"rules"`
+}
+
+// SplitTunnelRule represents a single split tunnel rule for persistence.
+type SplitTunnelRule struct {
+	Value string `koanf:"value"`
+	Type  string `koanf:"type"`
 }
 
 // Defaults returns a Config with default values.

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/leejooy96/azad/internal/protocol"
+	"github.com/leejooy96/azad/internal/splittunnel"
 	"github.com/xtls/xray-core/core"
 	"github.com/xtls/xray-core/infra/conf/serial"
 )
@@ -24,6 +25,12 @@ type LogConfig struct {
 	LogLevel string `json:"loglevel"`
 }
 
+// SniffingConfig configures traffic sniffing on an inbound.
+type SniffingConfig struct {
+	Enabled      bool     `json:"enabled"`
+	DestOverride []string `json:"destOverride"`
+}
+
 // InboundConfig represents an Xray inbound listener.
 type InboundConfig struct {
 	Tag      string          `json:"tag"`
@@ -31,6 +38,7 @@ type InboundConfig struct {
 	Port     int             `json:"port"`
 	Protocol string          `json:"protocol"`
 	Settings json.RawMessage `json:"settings,omitempty"`
+	Sniffing *SniffingConfig `json:"sniffing,omitempty"`
 }
 
 // OutboundConfig represents an Xray outbound connection.
@@ -97,17 +105,68 @@ type RoutingRule struct {
 	Type        string   `json:"type"`
 	OutboundTag string   `json:"outboundTag"`
 	IP          []string `json:"ip,omitempty"`
+	Domain      []string `json:"domain,omitempty"`
 }
 
 // BuildConfig converts a protocol.Server into a valid Xray *core.Config.
 // It returns both the intermediate XrayConfig (for inspection/testing) and
 // the loaded core.Config ready for core.New().
-func BuildConfig(srv protocol.Server, socksPort, httpPort int) (*XrayConfig, *core.Config, error) {
+// splitCfg may be nil, in which case behavior is identical to pre-split-tunnel.
+func BuildConfig(srv protocol.Server, socksPort, httpPort int, splitCfg *splittunnel.Config) (*XrayConfig, *core.Config, error) {
 	// Build protocol-specific outbound.
 	outbound, err := buildOutbound(srv)
 	if err != nil {
 		return nil, nil, err
 	}
+
+	sniffing := &SniffingConfig{
+		Enabled:      true,
+		DestOverride: []string{"http", "tls"},
+	}
+
+	// Determine outbound ordering based on split tunnel mode.
+	var outbounds []OutboundConfig
+	if splitCfg != nil && splitCfg.Enabled && splitCfg.Mode == splittunnel.ModeInclusive {
+		// Inclusive: direct first (default for unmatched), proxy for listed
+		outbounds = []OutboundConfig{
+			{Tag: "direct", Protocol: "freedom"},
+			outbound,
+		}
+	} else {
+		// Normal / Exclusive: proxy first (default for unmatched), direct for listed
+		outbounds = []OutboundConfig{
+			outbound,
+			{Tag: "direct", Protocol: "freedom"},
+		}
+	}
+
+	// Build routing rules.
+	domainStrategy := "AsIs"
+	var rules []RoutingRule
+
+	if splitCfg != nil && splitCfg.Enabled && len(splitCfg.Rules) > 0 {
+		// User split tunnel rules go FIRST (highest priority, before geoip:private).
+		for _, xr := range splittunnel.ToXrayRules(splitCfg.Rules, splitCfg.Mode) {
+			rules = append(rules, RoutingRule{
+				Type:        xr.Type,
+				OutboundTag: xr.OutboundTag,
+				IP:          xr.IP,
+				Domain:      xr.Domain,
+			})
+		}
+
+		// Change domain strategy if any domain rules exist.
+		if splittunnel.HasDomainRules(splitCfg.Rules) {
+			domainStrategy = "IPIfNonMatch"
+		}
+	}
+
+	// Private IPs always direct (safety net) -- always last.
+	rules = append(rules, RoutingRule{
+		Type:        "field",
+		OutboundTag: "direct",
+		IP:          []string{"geoip:private"},
+	})
 
 	cfg := &XrayConfig{
 		Log: LogConfig{LogLevel: "warning"},
@@ -118,27 +177,20 @@ func BuildConfig(srv protocol.Server, socksPort, httpPort int) (*XrayConfig, *co
 				Port:     socksPort,
 				Protocol: "socks",
 				Settings: json.RawMessage(`{"udp":true}`),
+				Sniffing: sniffing,
 			},
 			{
 				Tag:      "http-in",
 				Listen:   "127.0.0.1",
 				Port:     httpPort,
 				Protocol: "http",
+				Sniffing: sniffing,
 			},
 		},
-		Outbounds: []OutboundConfig{
-			outbound,
-			{Tag: "direct", Protocol: "freedom"},
-		},
+		Outbounds: outbounds,
 		Routing: RoutingConfig{
-			DomainStrategy: "IPIfNonMatch",
-			Rules: []RoutingRule{
-				{
-					Type:        "field",
-					OutboundTag: "direct",
-					IP:          []string{"geoip:private"},
-				},
-			},
+			DomainStrategy: domainStrategy,
+			Rules:          rules,
 		},
 	}
 

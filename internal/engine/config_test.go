@@ -489,8 +489,8 @@ func TestBuildConfig(t *testing.T) {
 			wantProto: "vless",
 			check: func(t *testing.T, cfg *XrayConfig) {
 				// Check routing
-				if cfg.Routing.DomainStrategy != "IPIfNonMatch" {
-					t.Errorf("domainStrategy = %q, want IPIfNonMatch", cfg.Routing.DomainStrategy)
+				if cfg.Routing.DomainStrategy != "AsIs" {
+					t.Errorf("domainStrategy = %q, want AsIs", cfg.Routing.DomainStrategy)
 				}
 				if len(cfg.Routing.Rules) < 1 {
 					t.Fatal("expected at least 1 routing rule")
@@ -554,7 +554,7 @@ func TestBuildConfig(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			xrayCfg, coreConfig, err := BuildConfig(tc.server, tc.socks, tc.http)
+			xrayCfg, coreConfig, err := BuildConfig(tc.server, tc.socks, tc.http, nil)
 			if tc.wantErr {
 				if err == nil {
 					t.Fatal("expected error, got nil")
@@ -593,7 +593,7 @@ func TestBuildConfigDefaults(t *testing.T) {
 		Network:  "tcp",
 		TLS:      "none",
 	}
-	xrayCfg, _, err := BuildConfig(srv, 1080, 8080)
+	xrayCfg, _, err := BuildConfig(srv, 1080, 8080, nil)
 	if err != nil {
 		t.Fatalf("BuildConfig error: %v", err)
 	}
@@ -620,7 +620,7 @@ func TestBuildConfigDefaults(t *testing.T) {
 		Network:  "tcp",
 		TLS:      "none",
 	}
-	xrayCfg2, _, err := BuildConfig(srv2, 1080, 8080)
+	xrayCfg2, _, err := BuildConfig(srv2, 1080, 8080, nil)
 	if err != nil {
 		t.Fatalf("BuildConfig error: %v", err)
 	}
@@ -650,7 +650,7 @@ func TestBuildConfigDefaults(t *testing.T) {
 		PublicKey: "RKAyucyPBLpwLK2SiW5pvbHTPg6NWa1lOs08EZJuEGk",
 		ShortID:   "0a1b2c3d",
 	}
-	xrayCfg3, _, err := BuildConfig(srv3, 1080, 8080)
+	xrayCfg3, _, err := BuildConfig(srv3, 1080, 8080, nil)
 	if err != nil {
 		t.Fatalf("BuildConfig error: %v", err)
 	}
