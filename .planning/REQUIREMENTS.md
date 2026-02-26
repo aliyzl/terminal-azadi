@@ -53,7 +53,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Quick Connect
 
-- [ ] **QCON-01**: User can run `azad` with no arguments to launch TUI and connect to last-used or fastest server
+- [x] **QCON-01**: User can run `azad` with no arguments to launch TUI and connect to last-used or fastest server
 - [x] **QCON-02**: User can run `azad connect` for headless quick-connect (no TUI, just connect and show status)
 - [x] **QCON-03**: App remembers last-used server and user preferences between sessions
 
@@ -127,7 +127,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | TUI-05 | Phase 4 | Complete |
 | TUI-06 | Phase 4 | Complete |
 | TUI-07 | Phase 4 | Complete |
-| QCON-01 | Phase 5 | Pending |
+| QCON-01 | Phase 5 | Complete |
 | QCON-02 | Phase 5 | Complete |
 | QCON-03 | Phase 5 | Complete |
 | DIST-01 | Phase 6 | Pending |
@@ -141,4 +141,4 @@ Deferred to future release. Tracked but not in current roadmap.
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-25 after 02-02 completion*
+*Last updated: 2026-02-26 after 05-02 completion*

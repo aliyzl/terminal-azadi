@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 5 of 6 (Quick Connect)
-Plan: 1 of 2 in current phase
-Status: Executing Phase 5
-Last activity: 2026-02-26 -- Completed 05-01-PLAN.md
+Plan: 2 of 2 in current phase (COMPLETE)
+Status: Phase 5 Complete
+Last activity: 2026-02-26 -- Completed 05-02-PLAN.md
 
-Progress: [████████░░] 85%
+Progress: [█████████░] 92%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
+- Total plans completed: 13
 - Average duration: 6min
-- Total execution time: 1.21 hours
+- Total execution time: 1.26 hours
 
 **By Phase:**
 
@@ -31,10 +31,10 @@ Progress: [████████░░] 85%
 | 2. Protocol Parsing | 2 | 9min | 5min |
 | 3. Connection Engine | 3 | 10min | 3min |
 | 4. TUI & Server Interaction | 4 | 13min | 3min |
-| 5. Quick Connect | 1 | 2min | 2min |
+| 5. Quick Connect | 2 | 5min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 4min, 3min, 5min, 1min, 2min
+- Last 5 plans: 3min, 5min, 1min, 2min, 3min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -86,6 +86,9 @@ Recent decisions affecting current work:
 - Explicit tea.PasteMsg case + view-aware default fallthrough for paste routing -- targeted fix over broader refactor (04-04)
 - Latency fallback uses positive LatencyMs only (> 0) to skip servers with no ping data (05-01)
 - Persistence errors are warnings-only since the primary proxy connection is already established (05-01)
+- Duplicated writeProxyState/removeStateFile in TUI to avoid exporting cli internals or circular dependency (05-02)
+- tea.Sequence for disconnect-then-reconnect ensures serial execution when switching servers (05-02)
+- Auto-connect skips silently on empty store (no error flash) per QCON-01 requirement (05-02)
 
 ### Pending Todos
 
@@ -100,5 +103,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 05-01-PLAN.md (Server resolution and preference persistence). Phase 5 in progress (1/2 plans).
-Resume file: .planning/phases/05-quick-connect/05-01-SUMMARY.md
+Stopped at: Completed 05-02-PLAN.md (TUI connection lifecycle). Phase 5 complete (2/2 plans).
+Resume file: .planning/phases/05-quick-connect/05-02-SUMMARY.md
