@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
+	"github.com/leejooy96/azad/internal/killswitch"
 	"github.com/leejooy96/azad/internal/sysproxy"
 	"golang.org/x/term"
 )
@@ -19,6 +20,11 @@ type ProxyState struct {
 	HTTPPort       int    `json:"http_port"`
 	NetworkService string `json:"network_service"`
 	PID            int    `json:"pid"`
+
+	// Kill switch fields (omitempty for backwards compatibility with existing state files)
+	KillSwitchActive bool   `json:"kill_switch_active,omitempty"`
+	ServerAddress    string `json:"server_address,omitempty"`
+	ServerPort       int    `json:"server_port,omitempty"`
 }
 
 // RunCleanup checks for dirty proxy state from a previous crash and reverses it.
@@ -55,12 +61,26 @@ func RunCleanup(configDir string) error {
 			fmt.Printf("Reversed system proxy on: %s\n", state.NetworkService)
 		}
 		fmt.Println("Proxy state cleaned.")
+	}
 
+	// Kill switch cleanup
+	if state.KillSwitchActive {
+		fmt.Println("Found active kill switch from previous session.")
+		if err := killswitch.Cleanup(); err != nil {
+			fmt.Printf("Warning: failed to flush kill switch rules: %v\n", err)
+			fmt.Printf("Manual recovery: sudo pfctl -a com.azad.killswitch -F all\n")
+		} else {
+			fmt.Println("Kill switch firewall rules removed.")
+		}
+	}
+
+	// Remove state file (handles both proxy and kill switch state cleanup)
+	if state.ProxySet || state.KillSwitchActive {
 		if err := os.Remove(stateFile); err != nil {
 			return fmt.Errorf("removing state file: %w", err)
 		}
 	} else {
-		fmt.Println("No dirty proxy state found. System is clean.")
+		fmt.Println("No dirty state found. System is clean.")
 	}
 
 	return nil
