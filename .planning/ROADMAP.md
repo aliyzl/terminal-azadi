@@ -95,10 +95,11 @@ Plans:
   1. Running `azad` with no arguments launches the TUI and auto-connects to the last-used server (or fastest if no history)
   2. Running `azad connect` connects headlessly without launching the TUI, printing status to stdout
   3. Server preference and last-used selection persist between sessions, so repeated launches connect to the user's preferred server without re-selection
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 05-01: TBD
+- [ ] 05-01-PLAN.md — Server resolution with latency fallback + headless connect persistence
+- [ ] 05-02-PLAN.md — TUI connection lifecycle: auto-connect, Enter/c connect, quit cleanup
 
 ### Phase 6: Distribution
 **Goal**: Users on macOS and Linux can install a single binary that handles first-run setup automatically
