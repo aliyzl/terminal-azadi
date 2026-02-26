@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** One command to connect to the fastest VPN server through a stunning terminal interface
-**Current focus:** Phase 4: TUI and Server Interaction
+**Current focus:** Phase 5: Quick Connect
 
 ## Current Position
 
-Phase: 4 of 6 (TUI and Server Interaction) -- COMPLETE
-Plan: 4 of 4 in current phase
-Status: Phase 4 Complete (gap closure done)
-Last activity: 2026-02-26 -- Completed 04-04-PLAN.md
+Phase: 5 of 6 (Quick Connect)
+Plan: 1 of 2 in current phase
+Status: Executing Phase 5
+Last activity: 2026-02-26 -- Completed 05-01-PLAN.md
 
-Progress: [████████░░] 80%
+Progress: [████████░░] 85%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
-- Average duration: 7min
-- Total execution time: 1.18 hours
+- Total plans completed: 12
+- Average duration: 6min
+- Total execution time: 1.21 hours
 
 **By Phase:**
 
@@ -31,9 +31,10 @@ Progress: [████████░░] 80%
 | 2. Protocol Parsing | 2 | 9min | 5min |
 | 3. Connection Engine | 3 | 10min | 3min |
 | 4. TUI & Server Interaction | 4 | 13min | 3min |
+| 5. Quick Connect | 1 | 2min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 4min, 3min, 5min, 1min
+- Last 5 plans: 4min, 3min, 5min, 1min, 2min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -83,6 +84,8 @@ Recent decisions affecting current work:
 - Input modal command functions take store as parameter (not closing over model state) for goroutine safety (04-03)
 - Overlay modals use lipgloss.Place centering over base content -- consistent with help overlay pattern (04-03)
 - Explicit tea.PasteMsg case + view-aware default fallthrough for paste routing -- targeted fix over broader refactor (04-04)
+- Latency fallback uses positive LatencyMs only (> 0) to skip servers with no ping data (05-01)
+- Persistence errors are warnings-only since the primary proxy connection is already established (05-01)
 
 ### Pending Todos
 
@@ -97,5 +100,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 04-04-PLAN.md (Fix paste in input modals). Phase 4 gap closure complete (4/4 plans).
-Resume file: .planning/phases/04-tui-and-server-interaction/04-04-SUMMARY.md
+Stopped at: Completed 05-01-PLAN.md (Server resolution and preference persistence). Phase 5 in progress (1/2 plans).
+Resume file: .planning/phases/05-quick-connect/05-01-SUMMARY.md
