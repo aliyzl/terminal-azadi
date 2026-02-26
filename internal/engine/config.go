@@ -22,6 +22,8 @@ type XrayConfig struct {
 
 // LogConfig configures Xray logging.
 type LogConfig struct {
+	Access   string `json:"access"`
+	Error    string `json:"error"`
 	LogLevel string `json:"loglevel"`
 }
 
@@ -112,7 +114,8 @@ type RoutingRule struct {
 // It returns both the intermediate XrayConfig (for inspection/testing) and
 // the loaded core.Config ready for core.New().
 // splitCfg may be nil, in which case behavior is identical to pre-split-tunnel.
-func BuildConfig(srv protocol.Server, socksPort, httpPort int, splitCfg *splittunnel.Config) (*XrayConfig, *core.Config, error) {
+// accessLogPath sets the Xray access log destination; use "none" to disable.
+func BuildConfig(srv protocol.Server, socksPort, httpPort int, splitCfg *splittunnel.Config, accessLogPath string) (*XrayConfig, *core.Config, error) {
 	// Build protocol-specific outbound.
 	outbound, err := buildOutbound(srv)
 	if err != nil {
@@ -169,7 +172,7 @@ func BuildConfig(srv protocol.Server, socksPort, httpPort int, splitCfg *splittu
 	})
 
 	cfg := &XrayConfig{
-		Log: LogConfig{LogLevel: "warning"},
+		Log: LogConfig{Access: accessLogPath, Error: "none", LogLevel: "warning"},
 		Inbounds: []InboundConfig{
 			{
 				Tag:      "socks-in",

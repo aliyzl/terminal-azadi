@@ -554,7 +554,7 @@ func TestBuildConfig(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			xrayCfg, coreConfig, err := BuildConfig(tc.server, tc.socks, tc.http, nil)
+			xrayCfg, coreConfig, err := BuildConfig(tc.server, tc.socks, tc.http, nil, "none")
 			if tc.wantErr {
 				if err == nil {
 					t.Fatal("expected error, got nil")
@@ -593,7 +593,7 @@ func TestBuildConfigDefaults(t *testing.T) {
 		Network:  "tcp",
 		TLS:      "none",
 	}
-	xrayCfg, _, err := BuildConfig(srv, 1080, 8080, nil)
+	xrayCfg, _, err := BuildConfig(srv, 1080, 8080, nil, "none")
 	if err != nil {
 		t.Fatalf("BuildConfig error: %v", err)
 	}
@@ -620,7 +620,7 @@ func TestBuildConfigDefaults(t *testing.T) {
 		Network:  "tcp",
 		TLS:      "none",
 	}
-	xrayCfg2, _, err := BuildConfig(srv2, 1080, 8080, nil)
+	xrayCfg2, _, err := BuildConfig(srv2, 1080, 8080, nil, "none")
 	if err != nil {
 		t.Fatalf("BuildConfig error: %v", err)
 	}
@@ -650,7 +650,7 @@ func TestBuildConfigDefaults(t *testing.T) {
 		PublicKey: "RKAyucyPBLpwLK2SiW5pvbHTPg6NWa1lOs08EZJuEGk",
 		ShortID:   "0a1b2c3d",
 	}
-	xrayCfg3, _, err := BuildConfig(srv3, 1080, 8080, nil)
+	xrayCfg3, _, err := BuildConfig(srv3, 1080, 8080, nil, "none")
 	if err != nil {
 		t.Fatalf("BuildConfig error: %v", err)
 	}
@@ -672,7 +672,7 @@ func TestBuildConfigSplitTunnel(t *testing.T) {
 	}
 
 	t.Run("nil split config behaves as before", func(t *testing.T) {
-		xrayCfg, coreConfig, err := BuildConfig(baseSrv, 1080, 8080, nil)
+		xrayCfg, coreConfig, err := BuildConfig(baseSrv, 1080, 8080, nil, "none")
 		if err != nil {
 			t.Fatalf("BuildConfig error: %v", err)
 		}
@@ -711,7 +711,7 @@ func TestBuildConfigSplitTunnel(t *testing.T) {
 			},
 		}
 
-		xrayCfg, _, err := BuildConfig(baseSrv, 1080, 8080, splitCfg)
+		xrayCfg, _, err := BuildConfig(baseSrv, 1080, 8080, splitCfg, "none")
 		if err != nil {
 			t.Fatalf("BuildConfig error: %v", err)
 		}
@@ -757,7 +757,7 @@ func TestBuildConfigSplitTunnel(t *testing.T) {
 			},
 		}
 
-		xrayCfg, _, err := BuildConfig(baseSrv, 1080, 8080, splitCfg)
+		xrayCfg, _, err := BuildConfig(baseSrv, 1080, 8080, splitCfg, "none")
 		if err != nil {
 			t.Fatalf("BuildConfig error: %v", err)
 		}

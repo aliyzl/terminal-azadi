@@ -37,6 +37,9 @@ const (
 	minHeight = 20
 )
 
+// hintBarHeight is the number of terminal rows the hint bar occupies.
+const hintBarHeight = 1
+
 // model is the root Bubble Tea model composing all child components.
 type model struct {
 	// Child models
@@ -139,10 +142,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case tickMsg:
-		// Refresh status bar for uptime counter
+		// Refresh status bar for uptime counter and poll traffic log.
 		status, _, _ := m.engine.Status()
 		if status == engine.StatusConnected {
-			// Status bar will recalculate uptime in its View
+			entries := m.engine.TrafficLog(m.detail.height)
+			m.detail.SetTrafficLog(entries)
 		}
 		return m, tickCmd()
 
@@ -215,6 +219,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case disconnectMsg:
 		m.statusBar.Update(engine.StatusDisconnected, "", m.cfg.Proxy.SOCKSPort)
 		m.statusBar.SetConnectedAt(time.Time{})
+		m.detail.ClearTrafficLog()
 		m.killSwitchActive = false
 		m.statusBar.SetKillSwitch(false)
 		if m.ready {
@@ -513,6 +518,13 @@ func (m model) handleKeyPress(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 			}
 			return m, nil
 
+		case "x":
+			status, _, _ := m.engine.Status()
+			if status == engine.StatusConnected || status == engine.StatusConnecting {
+				return m, tea.Sequence(disconnectCmd(m.engine, m.killSwitchActive), tea.ClearScreen)
+			}
+			return m, nil
+
 		case "esc":
 			// If filter is applied, let list handle clearing it
 			if m.serverList.FilterState() == list.FilterApplied {
@@ -561,7 +573,7 @@ func (m *model) resizeContent() {
 		bannerH = 1
 	}
 	listWidth := m.width / 3
-	contentHeight := m.height - statusBarHeight - bannerH
+	contentHeight := m.height - statusBarHeight - hintBarHeight - bannerH
 	m.serverList.SetSize(listWidth, contentHeight)
 	detailWidth := m.width - listWidth - 1
 	m.detail.SetSize(detailWidth, contentHeight)
@@ -633,6 +645,62 @@ func (m *model) rebuildListSortedByLatency() {
 	m.syncDetail()
 }
 
+// hintBar returns a context-aware shortcut hint line based on the current view.
+func (m model) hintBar() string {
+	keyStyle := lipgloss.NewStyle().Foreground(DefaultTheme.Accent.Dark).Bold(true)
+	sepStyle := lipgloss.NewStyle().Foreground(DefaultTheme.Border.Dark)
+	descStyle := lipgloss.NewStyle().Foreground(DefaultTheme.Border.Dark)
+	sep := sepStyle.Render(" · ")
+
+	hint := func(k, desc string) string {
+		return keyStyle.Render(k) + descStyle.Render(" "+desc)
+	}
+
+	var hints string
+	switch m.view {
+	case viewNormal:
+		status, _, _ := m.engine.Status()
+		if status == engine.StatusConnected || status == engine.StatusConnecting {
+			hints = hint("↑↓", "navigate") + sep +
+				hint("enter", "switch") + sep +
+				hint("x", "disconnect") + sep +
+				hint("m", "menu") + sep +
+				hint("a", "add") + sep +
+				hint("?", "help") + sep +
+				hint("q", "quit")
+		} else {
+			hints = hint("↑↓", "navigate") + sep +
+				hint("enter", "connect") + sep +
+				hint("m", "menu") + sep +
+				hint("a", "add") + sep +
+				hint("p", "ping") + sep +
+				hint("?", "help") + sep +
+				hint("q", "quit")
+		}
+	case viewMenu:
+		hints = hint("enter", "toggle KS") + sep +
+			hint("t", "split tunnel") + sep +
+			hint("esc", "close")
+	case viewSplitTunnel:
+		hints = hint("a", "add") + sep +
+			hint("d", "delete") + sep +
+			hint("e", "enable/disable") + sep +
+			hint("t", "toggle mode") + sep +
+			hint("esc", "back")
+	case viewConfirmDelete:
+		hints = hint("y", "confirm") + sep + hint("n", "cancel")
+	case viewConfirmKillSwitch:
+		hints = hint("y", "enable") + sep + hint("n", "cancel")
+	default:
+		return ""
+	}
+
+	return lipgloss.NewStyle().
+		Width(m.width).
+		Align(lipgloss.Center).
+		Render(hints)
+}
+
 // View renders the split-pane TUI layout.
 func (m model) View() tea.View {
 	if !m.ready {
@@ -663,7 +731,7 @@ func (m model) View() tea.View {
 
 	listWidth := m.width / 3
 	detailWidth := m.width - listWidth - 1
-	contentHeight := m.height - statusBarHeight - bannerHeight
+	contentHeight := m.height - statusBarHeight - hintBarHeight - bannerHeight
 
 	// Style the list panel with a right border
 	listStyle := lipgloss.NewStyle().
@@ -685,12 +753,13 @@ func (m model) View() tea.View {
 	// Compose horizontal layout
 	main := lipgloss.JoinHorizontal(lipgloss.Top, listPanel, detailPanel)
 
-	// Compose vertical layout with optional kill switch banner
+	// Compose vertical layout with optional kill switch banner and hint bar
+	hintLine := m.hintBar()
 	var content string
 	if banner != "" {
-		content = lipgloss.JoinVertical(lipgloss.Left, banner, main, m.statusBar.View())
+		content = lipgloss.JoinVertical(lipgloss.Left, banner, main, hintLine, m.statusBar.View())
 	} else {
-		content = lipgloss.JoinVertical(lipgloss.Left, main, m.statusBar.View())
+		content = lipgloss.JoinVertical(lipgloss.Left, main, hintLine, m.statusBar.View())
 	}
 
 	// Overlay modals based on view state

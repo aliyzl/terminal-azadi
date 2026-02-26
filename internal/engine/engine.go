@@ -45,11 +45,12 @@ func (s ConnectionStatus) String() string {
 
 // Engine manages the Xray-core proxy instance lifecycle.
 type Engine struct {
-	mu       sync.Mutex
-	instance *core.Instance
-	status   ConnectionStatus
-	server   *protocol.Server
-	err      error
+	mu         sync.Mutex
+	instance   *core.Instance
+	logCapture *LogCapture
+	status     ConnectionStatus
+	server     *protocol.Server
+	err        error
 }
 
 // Start creates and starts an Xray-core proxy instance for the given server.
@@ -84,9 +85,22 @@ func (e *Engine) Start(ctx context.Context, srv protocol.Server, socksPort, http
 		sc = splitCfg[0]
 	}
 
+	// Create log capture pipe for access log.
+	lc, accessLogPath, lcErr := NewLogCapture()
+	if lcErr != nil {
+		accessLogPath = "none"
+	}
+
+	closeLCOnError := func() {
+		if lc != nil {
+			lc.Close()
+		}
+	}
+
 	// Build the Xray JSON config and load it into a core.Config.
-	_, coreConfig, err := BuildConfig(srv, socksPort, httpPort, sc)
+	_, coreConfig, err := BuildConfig(srv, socksPort, httpPort, sc, accessLogPath)
 	if err != nil {
+		closeLCOnError()
 		e.status = StatusError
 		e.err = fmt.Errorf("building config: %w", err)
 		return e.err
@@ -95,6 +109,7 @@ func (e *Engine) Start(ctx context.Context, srv protocol.Server, socksPort, http
 	// Create the Xray instance from the protobuf config.
 	instance, err := core.New(coreConfig)
 	if err != nil {
+		closeLCOnError()
 		e.status = StatusError
 		e.err = fmt.Errorf("creating xray instance: %w", err)
 		return e.err
@@ -103,12 +118,14 @@ func (e *Engine) Start(ctx context.Context, srv protocol.Server, socksPort, http
 	// Start the proxy.
 	if err := instance.Start(); err != nil {
 		_ = instance.Close()
+		closeLCOnError()
 		e.status = StatusError
 		e.err = fmt.Errorf("starting xray instance: %w", err)
 		return e.err
 	}
 
 	e.instance = instance
+	e.logCapture = lc
 	srvCopy := srv
 	e.server = &srvCopy
 	e.status = StatusConnected
@@ -127,6 +144,10 @@ func (e *Engine) Stop() error {
 	}
 
 	err := e.instance.Close()
+	if e.logCapture != nil {
+		e.logCapture.Close()
+		e.logCapture = nil
+	}
 	e.instance = nil
 	e.server = nil
 	e.status = StatusDisconnected
@@ -141,6 +162,18 @@ func (e *Engine) Status() (ConnectionStatus, *protocol.Server, error) {
 	defer e.mu.Unlock()
 
 	return e.status, e.server, e.err
+}
+
+// TrafficLog returns the last n access log entries.
+// Returns nil if not connected or log capture is unavailable.
+func (e *Engine) TrafficLog(n int) []LogEntry {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+
+	if e.logCapture == nil {
+		return nil
+	}
+	return e.logCapture.Entries(n)
 }
 
 // ServerName returns the name of the currently connected server,

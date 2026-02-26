@@ -5,20 +5,32 @@ import (
 	"strings"
 
 	"charm.land/lipgloss/v2"
+	"github.com/leejooy96/azad/internal/engine"
 	"github.com/leejooy96/azad/internal/protocol"
 )
 
 // detailModel renders the detail panel showing information about the selected server.
 type detailModel struct {
-	server *protocol.Server
-	width  int
-	height int
-	styles Styles
+	server     *protocol.Server
+	trafficLog []engine.LogEntry
+	width      int
+	height     int
+	styles     Styles
 }
 
 // SetServer updates the server displayed in the detail panel.
 func (m *detailModel) SetServer(srv *protocol.Server) {
 	m.server = srv
+}
+
+// SetTrafficLog updates the traffic log entries displayed when connected.
+func (m *detailModel) SetTrafficLog(entries []engine.LogEntry) {
+	m.trafficLog = entries
+}
+
+// ClearTrafficLog removes all traffic log entries.
+func (m *detailModel) ClearTrafficLog() {
+	m.trafficLog = nil
 }
 
 // SetSize updates the dimensions available for rendering.
@@ -43,6 +55,16 @@ func (m detailModel) View() string {
 			Render(placeholder)
 	}
 
+	// If we have traffic log entries, show compact header + traffic log.
+	if len(m.trafficLog) > 0 {
+		return m.trafficLogView()
+	}
+
+	return m.serverDetailView()
+}
+
+// serverDetailView renders the full server detail (when disconnected).
+func (m detailModel) serverDetailView() string {
 	srv := m.server
 	var b strings.Builder
 
@@ -100,6 +122,94 @@ func (m detailModel) View() string {
 	if srv.LatencyMs > 0 {
 		latency := fmt.Sprintf("%dms", srv.LatencyMs)
 		b.WriteString(m.labelValue("Latency", latency))
+	}
+
+	return lipgloss.NewStyle().
+		Width(m.width).
+		Height(m.height).
+		PaddingLeft(2).
+		PaddingTop(1).
+		Render(b.String())
+}
+
+// trafficLogView renders a compact server header followed by scrollable traffic log.
+func (m detailModel) trafficLogView() string {
+	srv := m.server
+	var b strings.Builder
+
+	// Compact server header: name + protocol badge
+	name := m.styles.Accent.Bold(true).Render(srv.Name)
+	badge := m.styles.ProtocolBadge.Render(string(srv.Protocol))
+	b.WriteString(name + "  " + badge)
+	b.WriteString("\n")
+
+	// Separator
+	titleStyle := lipgloss.NewStyle().Foreground(DefaultTheme.Accent.Dark).Bold(true)
+	dimStyle := m.styles.Dim
+	b.WriteString("\n")
+	b.WriteString(titleStyle.Render("Traffic Log"))
+	b.WriteString("\n")
+
+	// Available width for content (minus padding)
+	contentWidth := m.width - 4
+	if contentWidth < 40 {
+		contentWidth = 40
+	}
+	b.WriteString(dimStyle.Render(strings.Repeat("─", contentWidth)))
+	b.WriteString("\n")
+
+	// Calculate how many log entries fit.
+	// Header uses 4 lines (name+badge, blank, title, separator).
+	// Each entry uses 1 line.
+	headerLines := 4
+	maxEntries := m.height - headerLines - 2 // padding
+	if maxEntries < 1 {
+		maxEntries = 1
+	}
+
+	// Show the most recent entries that fit.
+	entries := m.trafficLog
+	if len(entries) > maxEntries {
+		entries = entries[len(entries)-maxEntries:]
+	}
+
+	// Determine max domain width for alignment.
+	maxDomain := 0
+	for _, e := range entries {
+		if len(e.Domain) > maxDomain {
+			maxDomain = len(e.Domain)
+		}
+	}
+	// Cap domain width to prevent overflow.
+	domainCap := contentWidth - 18 // time(8) + spaces(4) + route(6)
+	if domainCap < 20 {
+		domainCap = 20
+	}
+	if maxDomain > domainCap {
+		maxDomain = domainCap
+	}
+
+	timeStyle := dimStyle
+	domainStyle := m.styles.Normal
+	routeProxyStyle := m.styles.Success
+	routeDirectStyle := dimStyle
+
+	for _, e := range entries {
+		domain := e.Domain
+		if len(domain) > maxDomain {
+			domain = domain[:maxDomain-1] + "…"
+		}
+
+		routeStyle := routeProxyStyle
+		if e.Route == "direct" {
+			routeStyle = routeDirectStyle
+		}
+
+		line := timeStyle.Render(e.Time) + "  " +
+			domainStyle.Render(fmt.Sprintf("%-*s", maxDomain, domain)) + "  " +
+			routeStyle.Render(e.Route)
+		b.WriteString(line)
+		b.WriteString("\n")
 	}
 
 	return lipgloss.NewStyle().
