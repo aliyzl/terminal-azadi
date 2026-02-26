@@ -117,7 +117,7 @@ Plans:
 
 ### Phase 7: Kill Switch
 **Goal**: When enabled, all non-VPN traffic is blocked at the firewall level — if VPN drops or terminal closes, nothing leaks. User can always recover via `azad` or `azad --cleanup`.
-**Depends on**: Phase 6
+**Depends on**: Phase 5
 **Requirements**: KILL-01, KILL-02, KILL-03, KILL-04, KILL-05
 **Success Criteria** (what must be TRUE):
   1. With kill switch enabled, closing the terminal or crashing the app blocks ALL internet traffic (no leak)
@@ -125,15 +125,16 @@ Plans:
   3. Running `azad --cleanup` disables the kill switch firewall rules and restores normal internet, even if VPN state is broken
   4. macOS shows a confirmation dialog when user tries to close the terminal window while kill switch is active
   5. Kill switch is a manual toggle (TUI keybinding or `azad connect --kill-switch`), not automatic
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 07-01: TBD
+- [ ] 07-01-PLAN.md — killswitch package (pf rules, privilege escalation, enable/disable API) + ProxyState extension + cleanup upgrade
+- [ ] 07-02-PLAN.md — Wire kill switch into CLI (--kill-switch flag), TUI (K keybinding toggle), startup recovery, status bar
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
