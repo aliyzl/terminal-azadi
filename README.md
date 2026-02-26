@@ -35,33 +35,11 @@ Azad is a keyboard-driven terminal VPN client that wraps [Xray-core](https://git
 
 ## Installation
 
-Download the latest binary from [GitHub Releases](https://github.com/aliyzl/terminal-azadi/releases/latest).
-
-### macOS
-
-```bash
-# Apple Silicon (M1/M2/M3/M4)
-curl -Lo azad.tar.gz https://github.com/aliyzl/terminal-azadi/releases/latest/download/azad_$(curl -s https://api.github.com/repos/aliyzl/terminal-azadi/releases/latest | grep tag_name | cut -d'"' -f4 | tr -d v)_darwin_arm64.tar.gz
-
-# Intel Mac
-curl -Lo azad.tar.gz https://github.com/aliyzl/terminal-azadi/releases/latest/download/azad_$(curl -s https://api.github.com/repos/aliyzl/terminal-azadi/releases/latest | grep tag_name | cut -d'"' -f4 | tr -d v)_darwin_amd64.tar.gz
-
-# Extract and install
-tar -xzf azad.tar.gz
-sudo mv azad /usr/local/bin/
-```
-
-### Linux
+1. Download the latest binary for your platform from [GitHub Releases](https://github.com/aliyzl/terminal-azadi/releases/latest)
+2. Extract and install:
 
 ```bash
-# x86_64
-curl -Lo azad.tar.gz https://github.com/aliyzl/terminal-azadi/releases/latest/download/azad_$(curl -s https://api.github.com/repos/aliyzl/terminal-azadi/releases/latest | grep tag_name | cut -d'"' -f4 | tr -d v)_linux_amd64.tar.gz
-
-# ARM64
-curl -Lo azad.tar.gz https://github.com/aliyzl/terminal-azadi/releases/latest/download/azad_$(curl -s https://api.github.com/repos/aliyzl/terminal-azadi/releases/latest | grep tag_name | cut -d'"' -f4 | tr -d v)_linux_arm64.tar.gz
-
-# Extract and install
-tar -xzf azad.tar.gz
+tar -xzf azad_*_*.tar.gz
 sudo mv azad /usr/local/bin/
 ```
 
