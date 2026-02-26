@@ -19,9 +19,7 @@ result: pass
 
 ### 2. Keyboard Navigation
 expected: Press j/k to navigate the server list up and down. The detail panel on the right updates to show the selected server's info (name, protocol, address, transport, TLS). Press enter on a server to select it.
-result: issue
-reported: "no"
-severity: major
+result: pass
 
 ### 3. Help Overlay
 expected: Press ? to open the help overlay. A centered bordered box appears showing all keybindings organized by group. Press ? or esc to dismiss it and return to the normal view.
@@ -32,16 +30,12 @@ expected: Press / to activate filter mode. A text input appears. Type a search t
 result: pass
 
 ### 5. Add Server via URI
-expected: Press a to open the "Add Server" input modal. Paste a valid server URI (e.g., vless://...) and press Enter. The server appears in the list. Press esc instead of enter to cancel without adding.
-result: issue
-reported: "modal opens but can't paste into the text input"
-severity: major
+expected: Press a to open the "Add Server" input modal. Paste a valid server URI (Cmd+V or Ctrl+V) and it appears in the text field. Press Enter — the server appears in the list.
+result: pass
 
 ### 6. Add Subscription
-expected: Press s to open the "Add Subscription" input modal. Paste a subscription URL and press Enter. Servers from the subscription appear in the list. Press esc to cancel.
-result: issue
-reported: "can't paste into the text input, but the subscription modal page opens"
-severity: major
+expected: Press s to open the "Add Subscription" input modal. Paste a subscription URL (Cmd+V or Ctrl+V) and it appears in the text field. Press Enter — servers from the subscription appear in the list.
+result: pass
 
 ### 7. Delete and Clear Servers
 expected: Select a server and press d to delete it — the server is removed from the list. Press D (shift+d) to clear all servers — a confirmation dialog appears asking y/n. Press y to confirm deletion, or n/esc to cancel.
@@ -62,39 +56,27 @@ result: pass
 ## Summary
 
 total: 10
-passed: 7
-issues: 3
+passed: 10
+issues: 0
 pending: 0
 skipped: 0
 
 ## Gaps
 
-- truth: "j/k navigates server list, detail panel updates on selection"
-  status: failed
-  reason: "User reported: no"
-  severity: major
-  test: 2
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
-
 - truth: "User can paste a server URI into the add-server input modal"
-  status: failed
+  status: resolved
   reason: "User reported: modal opens but can't paste into the text input"
   severity: major
   test: 5
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "tea.PasteMsg not routed to input model — falls through to serverList. Also clipboard command result from Ctrl+V never reaches textinput on second hop."
+  fix: "04-04-PLAN.md — Added tea.PasteMsg case and view-aware default fallthrough"
+  debug_session: ".planning/debug/paste-not-working.md"
 
 - truth: "User can paste a subscription URL into the add-subscription modal"
-  status: failed
+  status: resolved
   reason: "User reported: can't paste into the text input, but the subscription modal page opens"
   severity: major
   test: 6
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Same root cause as test 5 — tea.PasteMsg and clipboard result messages not routed to input model"
+  fix: "04-04-PLAN.md — Same fix as test 5"
+  debug_session: ".planning/debug/paste-not-working.md"
