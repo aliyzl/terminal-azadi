@@ -99,9 +99,9 @@ func tickCmd() tea.Cmd {
 	})
 }
 
-// Init starts the uptime ticker.
+// Init starts the uptime ticker and fires auto-connect on startup.
 func (m model) Init() tea.Cmd {
-	return tickCmd()
+	return tea.Batch(tickCmd(), autoConnectCmd(m.store, m.engine, m.cfg))
 }
 
 // Update handles messages and routes them to appropriate handlers.
@@ -175,6 +175,18 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.reloadServers()
 		return m, nil
 
+	case autoConnectMsg:
+		if msg.ServerID == "" || msg.Err != nil {
+			// Skipped (empty store) or failed -- do nothing.
+			return m, nil
+		}
+		// Auto-connect succeeded: update status bar and select the connected server.
+		m.statusBar.Update(engine.StatusConnected, m.engine.ServerName(), m.cfg.Proxy.SOCKSPort)
+		m.statusBar.SetConnectedAt(time.Now())
+		m.selectServerByID(msg.ServerID)
+		m.syncDetail()
+		return m, nil
+
 	case connectResultMsg:
 		status, srv, _ := m.engine.Status()
 		m.statusBar.Update(status, m.engine.ServerName(), m.cfg.Proxy.SOCKSPort)
@@ -184,6 +196,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if srv != nil {
 			m.detail.SetServer(srv)
 		}
+		// Auto-select the connected server in the list and sync detail.
+		if srv != nil {
+			m.selectServerByID(srv.ID)
+		}
+		m.syncDetail()
 		return m, nil
 
 	case disconnectMsg:
@@ -293,6 +310,10 @@ func (m model) handleKeyPress(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 
 		switch key {
 		case "q", "ctrl+c":
+			status, _, _ := m.engine.Status()
+			if status == engine.StatusConnected || status == engine.StatusConnecting {
+				return m, tea.Sequence(disconnectCmd(m.engine), tea.Quit)
+			}
 			return m, tea.Quit
 
 		case "?":
@@ -336,9 +357,16 @@ func (m model) handleKeyPress(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 			}
 			return m, nil
 
-		case "enter":
-			// Get selected server and update detail panel
-			m.syncDetail()
+		case "enter", "c":
+			if item, ok := m.serverList.SelectedItem().(serverItem); ok {
+				status, _, _ := m.engine.Status()
+				if status == engine.StatusConnected || status == engine.StatusConnecting {
+					// Already connected: disconnect first, then reconnect.
+					return m, tea.Sequence(disconnectCmd(m.engine), connectServerCmd(item.server, m.engine, m.cfg, m.store))
+				}
+				m.statusBar.Update(engine.StatusConnecting, item.server.Name, m.cfg.Proxy.SOCKSPort)
+				return m, connectServerCmd(item.server, m.engine, m.cfg, m.store)
+			}
 			return m, nil
 
 		case "esc":
@@ -361,6 +389,17 @@ func (m model) handleKeyPress(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 	}
 
 	return m, nil
+}
+
+// selectServerByID finds the server with the given ID in the list and selects it.
+func (m *model) selectServerByID(id string) {
+	items := m.serverList.Items()
+	for i, item := range items {
+		if si, ok := item.(serverItem); ok && si.server.ID == id {
+			m.serverList.Select(i)
+			return
+		}
+	}
 }
 
 // syncDetail updates the detail panel with the currently selected server.
