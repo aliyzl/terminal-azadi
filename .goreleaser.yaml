@@ -89,3 +89,30 @@ nfpms:
         dst: /usr/share/zsh/vendor-completions/_azad
       - src: completions/azad.fish
         dst: /usr/share/fish/vendor_completions.d/azad.fish
+
+# AUR_KEY SSH private key must be configured as a CI secret
+aurs:
+  - name: azad-bin
+    homepage: https://github.com/leejooy96/azad
+    description: "Beautiful terminal VPN client — one command to connect to the fastest server"
+    maintainers:
+      - "leejooy96"
+    license: MIT
+    private_key: "{{ .Env.AUR_KEY }}"
+    git_url: "ssh://aur@aur.archlinux.org/azad-bin.git"
+    skip_upload: "{{ if .IsSnapshot }}true{{ end }}"
+    package: |-
+      install -Dm755 "./azad" "${pkgdir}/usr/bin/azad"
+      install -Dm644 "./completions/azad.bash" "${pkgdir}/usr/share/bash-completion/completions/azad"
+      install -Dm644 "./completions/azad.zsh" "${pkgdir}/usr/share/zsh/site-functions/_azad"
+      install -Dm644 "./completions/azad.fish" "${pkgdir}/usr/share/fish/vendor_completions.d/azad.fish"
+
+# Classic confinement requires manual Snap Store review (can take days/weeks)
+snapcrafts:
+  - name: azad
+    summary: "Beautiful terminal VPN client"
+    description: "One command to connect to the fastest VPN server through a stunning terminal interface"
+    grade: stable
+    confinement: classic
+    license: MIT
+    publish: true
