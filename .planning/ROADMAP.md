@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation** - Go module, config system, CLI skeleton, signal handling, cleanup
 - [x] **Phase 2: Protocol Parsing** - Multi-protocol URI parsers, subscription fetcher, server data store
 - [x] **Phase 3: Connection Engine** - Xray-core proxy lifecycle, system proxy, connection verification
-- [x] **Phase 4: TUI and Server Interaction** - Full interactive terminal UI with server list, ping, navigation, and server management
+- [ ] **Phase 4: TUI and Server Interaction** - Full interactive terminal UI with server list, ping, navigation, and server management
 - [ ] **Phase 5: Quick Connect** - Zero-argument TUI launch, headless connect, session memory
 - [ ] **Phase 6: Distribution** - Cross-platform builds, geo asset management, recovery commands
 
@@ -79,12 +79,13 @@ Plans:
   4. User can add a server by pasting a URI, add servers from a subscription URL, refresh a subscription, and remove individual servers or clear all -- all through the TUI
   5. Pinging all servers runs concurrently with visual progress indication, and results sort the server list by latency
   6. Layout adapts to terminal size, color palette is consistent via lipgloss, and the app is readable in both dark and light terminals
-**Plans**: 3 plans
+**Plans**: 4 plans
 
 Plans:
 - [x] 04-01-PLAN.md — TUI visual foundation: theme, keybindings, messages, server list panel, detail panel, status bar
 - [x] 04-02-PLAN.md — Root model with split-pane layout, navigation, help overlay, CLI wiring
 - [x] 04-03-PLAN.md — Server management actions: add server/subscription, refresh, remove, ping all with progress
+- [ ] 04-04-PLAN.md — Gap closure: fix paste routing in input modals (tea.PasteMsg + view-aware default fallthrough)
 
 ### Phase 5: Quick Connect
 **Goal**: The "one command" promise -- launch azad with no arguments and be connected to the best server instantly
@@ -122,6 +123,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 1. Foundation | 2/2 | Complete    | 2026-02-24 |
 | 2. Protocol Parsing | 2/2 | Complete    | 2026-02-24 |
 | 3. Connection Engine | 3/3 | Complete    | 2026-02-25 |
-| 4. TUI and Server Interaction | 3/3 | Complete    | 2026-02-25 |
+| 4. TUI and Server Interaction | 3/4 | Gap closure | - |
 | 5. Quick Connect | 0/? | Not started | - |
 | 6. Distribution | 0/? | Not started | - |
