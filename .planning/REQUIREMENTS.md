@@ -67,9 +67,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **KILL-01**: App blocks all non-VPN traffic via macOS packet filter (pfctl) when kill switch is enabled
 - [x] **KILL-02**: Firewall rules persist if terminal closes or app crashes — no traffic leaks until user explicitly recovers
-- [ ] **KILL-03**: Running `azad` after crash/close resumes VPN or offers reconnect, restoring internet through VPN
+- [x] **KILL-03**: Running `azad` after crash/close resumes VPN or offers reconnect, restoring internet through VPN
 - [x] **KILL-04**: Running `azad --cleanup` removes kill switch firewall rules and restores normal internet even if VPN state is broken
-- [ ] **KILL-05**: macOS shows confirmation dialog when user tries to close terminal while kill switch is active (process detection)
+- [x] **KILL-05**: macOS shows confirmation dialog when user tries to close terminal while kill switch is active (process detection)
 
 ## v2 Requirements
 
@@ -143,9 +143,9 @@ Deferred to future release. Tracked but not in current roadmap.
 | DIST-03 | Phase 6 | Pending |
 | KILL-01 | Phase 7 | Complete |
 | KILL-02 | Phase 7 | Complete |
-| KILL-03 | Phase 7 | Pending |
+| KILL-03 | Phase 7 | Complete |
 | KILL-04 | Phase 7 | Complete |
-| KILL-05 | Phase 7 | Pending |
+| KILL-05 | Phase 7 | Complete |
 
 **Coverage:**
 - v1 requirements: 40 total

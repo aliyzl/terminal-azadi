@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 7 of 7 (Kill Switch)
-Plan: 1 of 2 in current phase (COMPLETE)
-Status: Phase 7 in progress — next: 07-02-PLAN.md
-Last activity: 2026-02-26 -- Completed 07-01-PLAN.md
+Plan: 2 of 2 in current phase (COMPLETE)
+Status: Phase 7 COMPLETE -- all plans executed
+Last activity: 2026-02-26 -- Completed 07-02-PLAN.md
 
-Progress: [█████████░] 93%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
+- Total plans completed: 15
 - Average duration: 6min
-- Total execution time: 1.29 hours
+- Total execution time: 1.37 hours
 
 **By Phase:**
 
@@ -32,10 +32,10 @@ Progress: [█████████░] 93%
 | 3. Connection Engine | 3 | 10min | 3min |
 | 4. TUI & Server Interaction | 4 | 13min | 3min |
 | 5. Quick Connect | 2 | 5min | 3min |
-| 7. Kill Switch | 1 | 2min | 2min |
+| 7. Kill Switch | 2 | 7min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 5min, 1min, 2min, 3min, 2min
+- Last 5 plans: 1min, 2min, 3min, 2min, 5min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -96,6 +96,11 @@ Recent decisions affecting current work:
 - Disable only flushes anchor, never calls pfctl -d which would break Apple's pf (07-01)
 - Cleanup prints manual recovery command on privilege failure to prevent user lockout (07-01)
 - ProxyState kill switch fields use omitempty for backwards compatibility (07-01)
+- Variadic bool on disconnectCmd for optional kill switch disable (07-02)
+- Read-modify-write tuiWriteProxyStateWithKS preserves existing proxy fields (07-02)
+- Uppercase K keybinding avoids conflict with k navigation (07-02)
+- No confirmation for disabling kill switch, only for enabling (07-02)
+- TUI init checks killswitch.IsActive() directly from pf anchor for crash recovery (07-02)
 
 ### Pending Todos
 
@@ -110,5 +115,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 07-01-PLAN.md (killswitch package + ProxyState extension). Phase 7 plan 1/2 done.
-Resume file: .planning/phases/07-kill-switch/07-01-SUMMARY.md
+Stopped at: Completed 07-02-PLAN.md (kill switch CLI/TUI integration). Phase 7 COMPLETE. All phases done.
+Resume file: .planning/phases/07-kill-switch/07-02-SUMMARY.md
