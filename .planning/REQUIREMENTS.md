@@ -77,8 +77,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **SPLT-02**: Exclusive mode routes all traffic through VPN except listed IPs/hostnames which go direct
 - [x] **SPLT-03**: Rules support single IPs, CIDR ranges, hostnames, and wildcard domains (*.example.com)
 - [ ] **SPLT-04**: User can add/remove rules, switch modes, and toggle split tunneling through TUI settings menu
-- [ ] **SPLT-05**: User can manage split tunnel rules via `azad split-tunnel` CLI subcommand (add/remove/list/mode/enable/disable/clear)
-- [ ] **SPLT-06**: Split tunneling coordinates with kill switch — bypass IPs allowed through pf firewall rules
+- [x] **SPLT-05**: User can manage split tunnel rules via `azad split-tunnel` CLI subcommand (add/remove/list/mode/enable/disable/clear)
+- [x] **SPLT-06**: Split tunneling coordinates with kill switch — bypass IPs allowed through pf firewall rules
 
 ## v2 Requirements
 
@@ -159,8 +159,8 @@ Deferred to future release. Tracked but not in current roadmap.
 | SPLT-02 | Phase 8 | Complete |
 | SPLT-03 | Phase 8 | Complete |
 | SPLT-04 | Phase 8 | Pending |
-| SPLT-05 | Phase 8 | Pending |
-| SPLT-06 | Phase 8 | Pending |
+| SPLT-05 | Phase 8 | Complete |
+| SPLT-06 | Phase 8 | Complete |
 
 **Coverage:**
 - v1 requirements: 46 total

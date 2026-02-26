@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 8 of 8 (Split Tunneling)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: Executing phase 8
-Last activity: 2026-02-26 -- Completed 08-01-PLAN.md
+Last activity: 2026-02-26 -- Completed 08-02-PLAN.md
 
-Progress: [████████░░] 80%
+Progress: [█████████░] 85%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
+- Total plans completed: 17
 - Average duration: 6min
-- Total execution time: 1.48 hours
+- Total execution time: 1.58 hours
 
 **By Phase:**
 
@@ -33,10 +33,10 @@ Progress: [████████░░] 80%
 | 4. TUI & Server Interaction | 4 | 13min | 3min |
 | 5. Quick Connect | 2 | 5min | 3min |
 | 7. Kill Switch | 2 | 7min | 4min |
-| 8. Split Tunneling | 1 | 7min | 7min |
+| 8. Split Tunneling | 2 | 13min | 7min |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 3min, 2min, 5min, 7min
+- Last 5 plans: 3min, 2min, 5min, 7min, 6min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -104,6 +104,9 @@ Recent decisions affecting current work:
 - TUI init checks killswitch.IsActive() directly from pf anchor for crash recovery (07-02)
 - XrayRoutingRule in splittunnel package to break circular dependency with engine (08-01)
 - Fix pre-existing test expecting IPIfNonMatch for nil split config -- was always AsIs (08-01)
+- Variadic params on Enable and Engine.Start for zero-breaking-change API evolution (08-02)
+- strings.Builder in GenerateRules for dynamic bypass IP injection (08-02)
+- loadConfig helper extracted in split_tunnel.go for DRY CLI config pattern (08-02)
 
 ### Pending Todos
 
@@ -118,5 +121,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 08-01-PLAN.md (split tunnel core: rule parsing, Xray translation, BuildConfig integration)
-Resume file: .planning/phases/08-split-tunneling/08-01-SUMMARY.md
+Stopped at: Completed 08-02-PLAN.md (split tunnel wiring: kill switch bypass IPs, Engine.Start config, CLI subcommand)
+Resume file: .planning/phases/08-split-tunneling/08-02-SUMMARY.md
