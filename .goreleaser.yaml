@@ -68,3 +68,24 @@ brews:
       bash_completion.install "completions/azad.bash" => "azad"
       zsh_completion.install "completions/azad.zsh" => "_azad"
       fish_completion.install "completions/azad.fish"
+
+nfpms:
+  - id: azad-linux
+    package_name: azad
+    file_name_template: "{{ .ConventionalFileName }}"
+    vendor: leejooy96
+    homepage: https://github.com/leejooy96/azad
+    maintainer: leejooy96
+    description: "Beautiful terminal VPN client — one command to connect to the fastest server"
+    license: MIT
+    formats:
+      - deb
+      - rpm
+    bindir: /usr/bin
+    contents:
+      - src: completions/azad.bash
+        dst: /usr/share/bash-completion/completions/azad
+      - src: completions/azad.zsh
+        dst: /usr/share/zsh/vendor-completions/_azad
+      - src: completions/azad.fish
+        dst: /usr/share/fish/vendor_completions.d/azad.fish
