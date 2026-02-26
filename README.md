@@ -33,51 +33,36 @@ Azad is a keyboard-driven terminal VPN client that wraps [Xray-core](https://git
 - **Cross-platform** — macOS and Linux (amd64 + arm64)
 - **Shell completions** — bash, zsh, and fish
 
-## Quick Start
-
-```bash
-# Install
-curl -sSL https://raw.githubusercontent.com/aliyzl/terminal-azadi/master/scripts/install.sh | sh
-
-# Launch
-azad
-```
-
-Then press `a` to add a server URI or `s` to add a subscription URL.
-
 ## Installation
 
-### Homebrew (macOS / Linux)
+Download the latest binary from [GitHub Releases](https://github.com/aliyzl/terminal-azadi/releases/latest).
+
+### macOS
 
 ```bash
-brew tap aliyzl/tap
-brew install azad
+# Apple Silicon (M1/M2/M3/M4)
+curl -Lo azad.tar.gz https://github.com/aliyzl/terminal-azadi/releases/latest/download/azad_$(curl -s https://api.github.com/repos/aliyzl/terminal-azadi/releases/latest | grep tag_name | cut -d'"' -f4 | tr -d v)_darwin_arm64.tar.gz
+
+# Intel Mac
+curl -Lo azad.tar.gz https://github.com/aliyzl/terminal-azadi/releases/latest/download/azad_$(curl -s https://api.github.com/repos/aliyzl/terminal-azadi/releases/latest | grep tag_name | cut -d'"' -f4 | tr -d v)_darwin_amd64.tar.gz
+
+# Extract and install
+tar -xzf azad.tar.gz
+sudo mv azad /usr/local/bin/
 ```
 
-### Debian / Ubuntu
+### Linux
 
 ```bash
-# Download the .deb from the latest release
-sudo dpkg -i azad_*_amd64.deb
-```
+# x86_64
+curl -Lo azad.tar.gz https://github.com/aliyzl/terminal-azadi/releases/latest/download/azad_$(curl -s https://api.github.com/repos/aliyzl/terminal-azadi/releases/latest | grep tag_name | cut -d'"' -f4 | tr -d v)_linux_amd64.tar.gz
 
-### Fedora / RHEL
+# ARM64
+curl -Lo azad.tar.gz https://github.com/aliyzl/terminal-azadi/releases/latest/download/azad_$(curl -s https://api.github.com/repos/aliyzl/terminal-azadi/releases/latest | grep tag_name | cut -d'"' -f4 | tr -d v)_linux_arm64.tar.gz
 
-```bash
-# Download the .rpm from the latest release
-sudo rpm -i azad_*_amd64.rpm
-```
-
-### Arch Linux (AUR)
-
-```bash
-yay -S azad-bin
-```
-
-### Snap
-
-```bash
-snap install azad --classic
+# Extract and install
+tar -xzf azad.tar.gz
+sudo mv azad /usr/local/bin/
 ```
 
 ### Build from Source
@@ -86,10 +71,18 @@ snap install azad --classic
 git clone https://github.com/aliyzl/terminal-azadi.git
 cd terminal-azadi
 go build -ldflags="-s -w" ./cmd/azad
-./azad
+sudo mv azad /usr/local/bin/
 ```
 
 Requires Go 1.25+.
+
+## Quick Start
+
+```bash
+azad
+```
+
+Then press `a` to add a server URI or `s` to add a subscription URL.
 
 ## Usage
 
